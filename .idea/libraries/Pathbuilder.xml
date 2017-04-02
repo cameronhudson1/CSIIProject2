@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Pathbuilder">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/Pathbuilder.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
