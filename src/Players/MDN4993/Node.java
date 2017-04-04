@@ -92,7 +92,7 @@ public class Node {
     }
 
     /**
-     * Stes the left neighbor to the node and sets the node to
+     * Sets the left neighbor to the node and sets the node to
      * the left node's right neighbor.
      * @param leftNeighbor the left neighbor of interest
      */
