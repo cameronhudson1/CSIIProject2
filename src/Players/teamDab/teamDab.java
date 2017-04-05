@@ -1,9 +1,6 @@
-package Players.MDN4993;
+package Players.teamDab;
 
-import Interface.Coordinate;
-import Interface.PlayerModule;
-import Interface.PlayerModulePart1;
-import Interface.PlayerMove;
+import Interface.*;
 
 import java.util.*;
 
@@ -12,7 +9,7 @@ import java.util.*;
  * moves by the referee.
  * @author Mark Nash
  */
-public class MDN4993 implements PlayerModulePart1, PlayerModule {
+public class teamDab implements PlayerModulePart2{
 
     /** The graph that stores the spots on the game board */
     private HashMap<Coordinate, Node> graph;
@@ -254,5 +251,32 @@ public class MDN4993 implements PlayerModulePart1, PlayerModule {
             }
         }
         return str;
+    }
+
+
+    /**
+     * Part 2 task that tests if a player can correctly
+     * generate all legal moves, assuming that it is that
+     * player's turn and given the current game status.
+     *
+     * @return
+     */
+    @Override
+    public List allLegalMoves() {
+        return null;
+    }
+
+
+    /**
+     * Part 2 task that computes the fewest segments that
+     * a given player needs to add to complete a winning
+     * path.
+     *
+     * @param i
+     * @return
+     */
+    @Override
+    public int fewestSegmentsToVictory(int i) {
+        return 0;
     }
 }
