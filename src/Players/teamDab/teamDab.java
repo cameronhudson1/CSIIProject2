@@ -262,8 +262,15 @@ public class teamDab implements PlayerModulePart2{
      * @return
      */
     @Override
-    public List allLegalMoves() {
-        return null;
+    public List<PlayerMove> allLegalMoves() {
+        ArrayList<PlayerMove> moves = new ArrayList<>();
+
+        for(Coordinate coord : this.graph.keySet()){
+            if(this.graph.get(coord).getPlayerOccupied() == 0){
+                moves.add(new PlayerMove(coord, this.playerId));
+            }
+        }
+        return moves;
     }
 
 
