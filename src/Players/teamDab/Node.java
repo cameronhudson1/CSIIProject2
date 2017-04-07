@@ -20,17 +20,25 @@ public class Node {
     /** What player occupies the space, 0 for no one */
     private int playerOccupied;
 
+    /** Stores the row in the graph. -2 if not yet put in the graph */
+    private int row;
+
+    /** Stores the column in the graph. -2 if not yet put in the graph */
+    private int column;
+
     /**
      * Constructor for Node class. Sets playerOccupied to 0 initially, loads
      * its neighbors as null for the four corners.
      */
-    public Node() {
-        this.playerOccupied = 0;
+    public Node(int playerOccupied) {
+        this.playerOccupied = playerOccupied;
         this.neighbors = new ArrayList<>(4);
         this.neighbors.add(null);
         this.neighbors.add(null);
         this.neighbors.add(null);
         this.neighbors.add(null);
+        this.row = -2;
+        this.column = -2;
     }
 
     /**
@@ -101,5 +109,41 @@ public class Node {
         if (leftNeighbor != null) {
             leftNeighbor.neighbors.set(1, this);
         }
+    }
+
+    /**
+     * @return the row field
+     */
+    public int getRow() {
+        return this.row;
+    }
+
+    /**
+     * @return the column field
+     */
+    public int getColumn() {
+        return this.column;
+    }
+
+    /**
+     * Sets the row field
+     * @param row the row number to be set
+     */
+    public void setRow(int row) {
+        this.row = row;
+    }
+
+    /**
+     * sets the column field
+     * @param column the column number to be set
+     */
+    public void setColumn(int column) {
+        this.column = column;
+    }
+
+    @Override
+    public String toString() {
+        return "a " + getPlayerOccupied() + " at row: " + this.getRow() + " " +
+                "and at column: " + this.getColumn();
     }
 }

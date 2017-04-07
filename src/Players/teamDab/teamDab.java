@@ -9,13 +9,16 @@ import java.util.*;
  * moves by the referee.
  * @author Mark Nash
  */
-public class teamDab implements PlayerModulePart2{
+public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
 
     /** The graph that stores the spots on the game board */
     private HashMap<Coordinate, Node> graph;
 
     /** The dimensions of the game board */
     private int dim;
+
+    /** The maximum cells on the game board */
+    private int max;
 
     /** This player's player id */
     private int playerId;
@@ -33,8 +36,9 @@ public class teamDab implements PlayerModulePart2{
      */
     public void initPlayer(int dim, int playerId) {
         this.dim = dim;
+        this.max = 2 * dim + 1;
         this.playerId = playerId;
-        this.graph = new HashMap<>(2 * (2 * dim + 1));
+        this.graph = new HashMap<>((int)Math.pow(max, 2) + 4);
         initGraph();
     }
 
@@ -115,17 +119,17 @@ public class teamDab implements PlayerModulePart2{
      * Initializes the game board in the graph and the imaginary pointer nodes
      */
     private void initGraph() {
-        for (int i = 0; i < 2 * dim + 1; i++) {
-            for (int j = 0; j < 2 * dim + 1; j++) {
+        for (int i = 0; i < max; i++) {
+            for (int j = 0; j < max; j++) {
                 Coordinate coord = new Coordinate(i, j);
                 if ((i % 2 == 0 && j % 2 == 0) || (i % 2 != 0 && j % 2 != 0)) {
-                    Node n = new Node();
-                    graph.put(coord, n);
+                    Node n = new Node(0);
+                    place(coord, n);
                     setNeighbors(new Coordinate(i, j), n);
                 }
                 else {
-                    Node n = new Node();
-                    graph.put(coord, n);
+                    Node n = new Node(0);
+                    place(coord, n);
                     setNeighbors(new Coordinate(i, j), n);
                     if (i % 2 == 0 && j % 2 != 0) {
                         n.setPlayerOccupied(2);
@@ -137,23 +141,15 @@ public class teamDab implements PlayerModulePart2{
             }
         }
         // Creates the four side pointer nodes. mutually assigns their neighbors
-        Node n0 = new Node();
-        n0.setPlayerOccupied(2);
-        n0.getNeighbors().clear();
-        graph.put(new Coordinate(-1, 0), n0);
-        Node n1 = new Node();
-        n1.setPlayerOccupied(1);
-        n1.getNeighbors().clear();
-        graph.put(new Coordinate(-1, 1), n1);
-        Node n2 = new Node();
-        n2.setPlayerOccupied(2);
-        n2.getNeighbors().clear();
-        graph.put(new Coordinate(-1, 2), n2);
-        Node n3 = new Node();
-        n3.setPlayerOccupied(1);
-        n3.getNeighbors().clear();
-        graph.put(new Coordinate(-1, 3), n3);
-        for (int i = 1; i < 2 * dim + 1; i += 2) {
+        Node n0 = new Node(2);
+        place(new Coordinate(-1, 0), n0);
+        Node n1 = new Node(1);
+        place(new Coordinate(-1, 1), n1);
+        Node n2 = new Node(2);
+        place(new Coordinate(-1, 2), n2);
+        Node n3 = new Node(1);
+        place(new Coordinate(-1, 3), n3);
+        for (int i = 1; i < max; i += 2) {
             n0.getNeighbors().add(graph.get(new Coordinate(0, i)));
             graph.get(new Coordinate(0, i)).getNeighbors().set(0, n0);
             n1.getNeighbors().add(graph.get(new Coordinate(i, 2 * dim)));
@@ -178,7 +174,7 @@ public class teamDab implements PlayerModulePart2{
      * @return if the coordinate is not on the right border of the game board
      */
     private boolean isNotRightBorder(Coordinate coord) {
-        return coord.getCol() != 2 * dim + 1;
+        return coord.getCol() != max;
     }
 
     /**
@@ -186,7 +182,7 @@ public class teamDab implements PlayerModulePart2{
      * @return if the coordinate is not on the bottom border of the game board
      */
     private boolean isNotBottomBorder(Coordinate coord) {
-        return coord.getRow() != 2 * dim + 1;
+        return coord.getRow() != max;
     }
 
     /**
@@ -235,9 +231,9 @@ public class teamDab implements PlayerModulePart2{
     @Override
     public String toString() {
         String str = "";
-        for (int i = 0; i < (2 * dim + 1); i++) {
+        for (int i = 0; i < (max); i++) {
             str += "\n";
-            for (int j = 0; j < (2 * dim + 1); j++) {
+            for (int j = 0; j < (max); j++) {
                 Node n = graph.get(new Coordinate(i, j));
                 if (n.getPlayerOccupied() == 1) {
                     str += "X ";
@@ -253,37 +249,89 @@ public class teamDab implements PlayerModulePart2{
         return str;
     }
 
+    public void place(Coordinate c, Node n) {
+        graph.put(c, n);
+        n.setRow(c.getRow());
+        n.setColumn(c.getCol());
+    }
 
     /**
      * Part 2 task that tests if a player can correctly
      * generate all legal moves, assuming that it is that
      * player's turn and given the current game status.
      *
-     * @return
+     * @return a List of all legal PlayerMove objects. They do not have to be
+     * in any particular order.
      */
     @Override
     public List<PlayerMove> allLegalMoves() {
-        ArrayList<PlayerMove> moves = new ArrayList<>();
-
-        for(Coordinate coord : this.graph.keySet()){
-            if(this.graph.get(coord).getPlayerOccupied() == 0){
-                moves.add(new PlayerMove(coord, this.playerId));
+        LinkedList<PlayerMove> ll = new LinkedList<>();
+        for (int i = 1; i < max - 1; i++) {
+            for (int j = 1; j < max - 1; j++) {
+                if (graph.get(new Coordinate(i, j)).getPlayerOccupied() == 0) {
+                    ll.add(new PlayerMove(new Coordinate(i, j), playerId));
+                }
             }
         }
-        return moves;
+        return ll;
     }
 
+    private void visitEndCells(Node current, Set<Node> visited,
+                               List<Node> endCells, int id) {
+
+    }
 
     /**
      * Part 2 task that computes the fewest segments that
      * a given player needs to add to complete a winning
      * path.
      *
-     * @param i
-     * @return
+     * @param i the player of interest
+     * @return the fewest number of segments to add to complete a path
      */
     @Override
     public int fewestSegmentsToVictory(int i) {
         return 0;
     }
+
+    public static void main(String[] args) {
+        /*
+        teamDab t = new teamDab();
+        t.initPlayer(6, 1);
+        String str = "PREMOVE 7,1,1\n" +
+                "PREMOVE 6,4,2\n" +
+                "PREMOVE 11,3,1\n" +
+                "PREMOVE 11,7,2\n" +
+                "PREMOVE 5,5,1\n" +
+                "PREMOVE 8,10,2\n" +
+                "PREMOVE 10,10,1\n" +
+                "PREMOVE 1,9,2\n" +
+                "PREMOVE 7,5,1\n" +
+                "PREMOVE 6,6,2\n" +
+                "PREMOVE 4,4,1\n" +
+                "PREMOVE 3,11,2\n" +
+                "PREMOVE 5,3,1\n" +
+                "PREMOVE 8,2,2\n" +
+                "PREMOVE 9,9,1\n" +
+                "PREMOVE 10,6,2\n" +
+                "PREMOVE 1,1,1\n" +
+                "PREMOVE 2,4,2\n" +
+                "PREMOVE 3,1,1\n" +
+                "PREMOVE 2,8,2\n" +
+                "PREMOVE 9,7,1\n" +
+                "PREMOVE 4,8,2\n" +
+                "PREMOVE 5,11,1\n" +
+                "PREMOVE 2,6,2";
+        String[] s1 = str.split("\n");
+        String[][] s2;
+        for (String s : s1) {
+            String b = s.substring(8, s.length());
+            String[] a = b.split(",");
+            t.lastMove(new PlayerMove(new Coordinate(Integer.parseInt(a[0]), Integer
+                    .parseInt(a[1])), Integer.parseInt(a[2])));
+        }
+        System.out.println(t);
+        */
+    }
+
 }
