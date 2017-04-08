@@ -63,6 +63,12 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
     /**
      * Indicates that the other player has been invalidated.
      * Required task for Part 2.
+     *
+     * Called by Referee when one player has been Invalidated.  This function will call all of the required moves for
+     * the other player to win.
+     *
+     * Follows the predecessors on Dijkstra's algorithm back through the path.  At each required move (predecessor),
+     * lastMove() is called to connect that node to it's neighbors.
      */
     public void otherPlayerInvalidated() {
         this.fewestSegmentsToVictory(playerId);
@@ -75,11 +81,8 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
             PlayerMove nextMove = new PlayerMove(finishCoord, playerId);
 
             lastMove(nextMove);
-            System.out.println(this.toString());
             finish = finish.getPredecessor();
         }
-
-        System.out.println(this.hasWonGame(playerId));
     }
 
     /**
@@ -87,6 +90,9 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
      * that updating internal game state does NOT occur inside of this method.
      * See lastMove. An initial, working version of this method is required for
      * Part 2. It may be refined subsequently.
+     *
+     * Uses Dijkstra's algorithm to find the closest required move for the sortest path.  Creates an instance of the
+     * PlayerMove class to represent that move.  This PlayerMove is returned.
      *
      * @return a PlayerMove object representing the next move.
      */
@@ -416,7 +422,7 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
 
     public static void main(String[] args) {
         teamDab t = new teamDab();
-        t.initPlayer(6, 1);
+        t.initPlayer(6, 2);
         String str = "PREMOVE 7,1,1\n" +
                 "PREMOVE 6,4,2\n" +
                 "PREMOVE 11,3,1\n" +
@@ -450,9 +456,8 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
                     .parseInt(a[1])), Integer.parseInt(a[2])));
         }
         System.out.println(t);
-        System.out.println(t.fewestSegmentsToVictory(1));
+        System.out.println(t.fewestSegmentsToVictory(2));
 
         t.otherPlayerInvalidated();
-        System.out.println(t);
     }
 }
