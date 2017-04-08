@@ -3,10 +3,10 @@ package Players.teamDab;
 import java.util.ArrayList;
 
 /**
- * A node class to represent every space on the game board. If it is a
- * playable space, isEdge is true. If it is an, then there can be a player
- * occupying it specified by the integer of the player number. Each node has
- * an array list of its four directional neighbors.
+ * A node class to represent every space on the game board. There can be a
+ * player occupying it specified by the integer of the player number. Each
+ * node has an array list of its four directional neighbors, unless it is one
+ * of the four side pointer nodes.
  * @author Mark Nash
  */
 public class Node {
@@ -26,6 +26,10 @@ public class Node {
     /** Stores the column in the graph. -2 if not yet put in the graph */
     private int column;
 
+    private Node predecessor;
+
+    private int distance;
+
     /**
      * Constructor for Node class. Sets playerOccupied to 0 initially, loads
      * its neighbors as null for the four corners.
@@ -39,6 +43,8 @@ public class Node {
         this.neighbors.add(null);
         this.row = -2;
         this.column = -2;
+        this.predecessor = null;
+        this.distance = Integer.MAX_VALUE;
     }
 
     /**
@@ -141,9 +147,23 @@ public class Node {
         this.column = column;
     }
 
+    public int getDistance() {
+        return distance;
+    }
+
+    public void setPredecessor(Node predecessor) {
+        this.predecessor = predecessor;
+    }
+
+    public void setDistance(int distance) {
+        this.distance = distance;
+    }
+
     @Override
     public String toString() {
-        return "a " + getPlayerOccupied() + " at row: " + this.getRow() + " " +
-                "and at column: " + this.getColumn();
+        return "Player " + getPlayerOccupied() + " occupies a space at " +
+                "row: " + this.getRow() + " and at column: " + this.getColumn();
     }
+
+
 }

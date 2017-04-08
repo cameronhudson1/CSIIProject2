@@ -17,11 +17,13 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
     /** The dimensions of the game board */
     private int dim;
 
-    /** The maximum cells on the game board */
+    /** The maximum cells on the game board horizontally or vertically */
     private int max;
 
     /** This player's player id */
     private int playerId;
+
+    private List<Node> dijVertexHolder;
 
     /**
      * Method called to initialize a player module. Required task for Part 1.
@@ -39,6 +41,7 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
         this.max = 2 * dim + 1;
         this.playerId = playerId;
         this.graph = new HashMap<>((int)Math.pow(max, 2) + 4);
+        this.dijVertexHolder = new LinkedList<>();
         initGraph();
     }
 
@@ -174,7 +177,7 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
      * @return if the coordinate is not on the right border of the game board
      */
     private boolean isNotRightBorder(Coordinate coord) {
-        return coord.getCol() != max;
+        return coord.getCol() != max-1;
     }
 
     /**
@@ -182,7 +185,7 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
      * @return if the coordinate is not on the bottom border of the game board
      */
     private boolean isNotBottomBorder(Coordinate coord) {
-        return coord.getRow() != max;
+        return coord.getRow() != max-1;
     }
 
     /**
@@ -191,6 +194,11 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
      */
     private boolean isNotLeftBorder(Coordinate coord) {
         return coord.getCol() != 0;
+    }
+
+    private boolean isNotABoarder(Coordinate c) {
+        return (isNotTopBorder(c) && isNotRightBorder(c) &&
+                isNotBottomBorder(c) && isNotLeftBorder(c));
     }
 
     /**
@@ -231,9 +239,9 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
     @Override
     public String toString() {
         String str = "";
-        for (int i = 0; i < (max); i++) {
+        for (int i = 0; i < max; i++) {
             str += "\n";
-            for (int j = 0; j < (max); j++) {
+            for (int j = 0; j < max; j++) {
                 Node n = graph.get(new Coordinate(i, j));
                 if (n.getPlayerOccupied() == 1) {
                     str += "X ";
@@ -249,6 +257,13 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
         return str;
     }
 
+    /**
+     * A helper method to put a coordinate-node pair in the graph, but also
+     * assign the node's row and column values when we need to reverse get
+     * from the graph.
+     * @param c the coordinate of the node to put in the graph.
+     * @param n the node to put in the graph.
+     */
     public void place(Coordinate c, Node n) {
         graph.put(c, n);
         n.setRow(c.getRow());
@@ -276,11 +291,6 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
         return ll;
     }
 
-    private void visitEndCells(Node current, Set<Node> visited,
-                               List<Node> endCells, int id) {
-
-    }
-
     /**
      * Part 2 task that computes the fewest segments that
      * a given player needs to add to complete a winning
@@ -291,11 +301,99 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
      */
     @Override
     public int fewestSegmentsToVictory(int i) {
-        return 0;
+        Node start = graph.get(new Coordinate(-1, i == 1 ? 3 : 0));
+        Node finish =  graph.get(new Coordinate(-1, i == 1 ? 1 : 2));
+        initDijkstra(start, finish, i);
+        Node current;
+        while (!dijVertexHolder.isEmpty()) {
+            current = dequeueMin(dijVertexHolder);
+            List<Node> neighbors = getDijkstraNeighbors(current, start,
+                    finish, i);
+            if (current.getDistance() == Integer.MAX_VALUE) {
+                break;
+            }
+            for (Node nbr : neighbors) {
+                int distThroughNbr = current.getDistance() + 1;
+                if (distThroughNbr < nbr.getDistance()) {
+                    nbr.setDistance(distThroughNbr);
+                    nbr.setPredecessor(current);
+                }
+            }
+        }
+        return finish.getDistance() - 1;
+    }
+
+    private void initDijkstra(Node start, Node finish, int id) {
+        start.setDistance(0);
+        start.setPredecessor(null);
+        finish.setDistance(Integer.MAX_VALUE);
+        finish.setPredecessor(null);
+        dijVertexHolder.add(start);
+        for (int i = 0; i < max; i++) {
+            for (int j = 0; j < max; j++) {
+                Coordinate coord = new Coordinate(i, j);
+                Node current = graph.get(coord);
+                if (current.getPlayerOccupied() == (id == 1 ? 2 : 1)) {
+                    continue;
+                }
+                if (current.getPlayerOccupied() == 0 && !isNotABoarder(coord)) {
+                    continue;
+                }
+                current.setPredecessor(null);
+                current.setDistance(Integer.MAX_VALUE);
+                dijVertexHolder.add(current);
+            }
+        }
+        for (Node n : dijVertexHolder) {
+            System.out.println(n);
+        }
+    }
+
+    private List<Node> getDijkstraNeighbors(Node n, Node start, Node finish,
+                                            int id) {
+        List<Node> neighbors = new ArrayList<>();
+        Queue<Node> queue = new LinkedList<>();
+        queue.add(n);
+        Set<Node> visited = new HashSet<>();
+        visited.add(start);
+        visited.add(n);
+        while (!queue.isEmpty()) {
+            Node current = queue.remove();
+            for (Node nbr : current.getNeighbors()) {
+                if (nbr == null) {
+                    continue;
+                }
+                if (nbr.getPlayerOccupied() == id && !visited.contains(nbr)) {
+                    visited.add(nbr);
+                    if (nbr != finish) {
+                        queue.add(nbr);
+                    }
+                    else {
+                        neighbors.add(nbr);
+                    }
+                }
+                else if (!visited.contains(nbr) && nbr.getPlayerOccupied() == 0
+                        && isNotABoarder(new Coordinate(nbr.getRow(),
+                        nbr.getColumn()))) {
+                    visited.add(nbr);
+                    neighbors.add(nbr);
+                }
+            }
+        }
+        return neighbors;
+    }
+
+    private Node dequeueMin(List<Node> priorityQ) {
+        Node minNode = priorityQ.get(0);  // start off with first one
+        for (Node n : priorityQ) { // checks first one again...
+            if(n.getDistance() < minNode.getDistance()) {
+                minNode = n;
+            }
+        }
+        return priorityQ.remove(priorityQ.indexOf(minNode));
     }
 
     public static void main(String[] args) {
-        /*
         teamDab t = new teamDab();
         t.initPlayer(6, 1);
         String str = "PREMOVE 7,1,1\n" +
@@ -331,7 +429,6 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
                     .parseInt(a[1])), Integer.parseInt(a[2])));
         }
         System.out.println(t);
-        */
+        System.out.println(t.fewestSegmentsToVictory(1));
     }
-
 }
