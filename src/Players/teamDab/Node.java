@@ -62,6 +62,15 @@ public class Node {
     }
 
     /**
+     * Accessor Method for getting a predecessor.
+     * @return
+     */
+
+    public Node getPredecessor(){
+        return this.predecessor;
+    }
+
+    /**
      * Setter for playerOccupied
      * @param player the player to occupy the spot
      */

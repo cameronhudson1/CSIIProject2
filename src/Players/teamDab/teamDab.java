@@ -1,6 +1,7 @@
 package Players.teamDab;
 
 import Interface.*;
+import com.sun.org.apache.xpath.internal.SourceTree;
 
 import java.util.*;
 
@@ -64,7 +65,24 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
      * Required task for Part 2.
      */
     public void otherPlayerInvalidated() {
+        this.fewestSegmentsToVictory(playerId);
 
+        Node start = graph.get(new Coordinate(-1, playerId == 1 ? 3 : 0));
+        Node finish = graph.get(new Coordinate(-1, playerId == 1 ? 1 : 2));
+
+        while(finish.getPredecessor() != start){
+            Coordinate finishCoord = new Coordinate(finish.getRow(), finish.getColumn());
+            PlayerMove nextMove = new PlayerMove(finishCoord, playerId);
+
+            lastMove(nextMove);
+
+            System.out.println(this.toString());
+        }
+
+        Coordinate finishCoord = new Coordinate(finish.getRow(), finish.getColumn());
+        PlayerMove nextMove = new PlayerMove(finishCoord, playerId);
+
+        lastMove(nextMove);
     }
 
     /**
@@ -72,10 +90,24 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
      * that updating internal game state does NOT occur inside of this method.
      * See lastMove. An initial, working version of this method is required for
      * Part 2. It may be refined subsequently.
+     *
      * @return a PlayerMove object representing the next move.
      */
     public PlayerMove move() {
-        return null;
+        //Figure that out
+        this.fewestSegmentsToVictory(playerId);
+
+        Node start = graph.get(new Coordinate(-1, playerId == 1 ? 3 : 0));
+        Node finish = graph.get(new Coordinate(-1, playerId == 1 ? 1 : 2));
+
+        while(finish.getPredecessor() != start){
+            finish = finish.getPredecessor();
+        }
+
+        Coordinate finishCoord = new Coordinate(finish.getRow(), finish.getColumn());
+        PlayerMove nextMove = new PlayerMove(finishCoord, playerId);
+
+        return nextMove;
     }
 
     /**
@@ -344,9 +376,6 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
                 dijVertexHolder.add(current);
             }
         }
-        for (Node n : dijVertexHolder) {
-            System.out.println(n);
-        }
     }
 
     private List<Node> getDijkstraNeighbors(Node n, Node start, Node finish,
@@ -430,5 +459,8 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
         }
         System.out.println(t);
         System.out.println(t.fewestSegmentsToVictory(1));
+
+        t.otherPlayerInvalidated();
+        System.out.println(t);
     }
 }
