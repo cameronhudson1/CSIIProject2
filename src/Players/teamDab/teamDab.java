@@ -71,18 +71,15 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
         Node finish = graph.get(new Coordinate(-1, playerId == 1 ? 1 : 2));
 
         while(finish.getPredecessor() != start){
-            Coordinate finishCoord = new Coordinate(finish.getRow(), finish.getColumn());
+            Coordinate finishCoord = new Coordinate(finish.getPredecessor().getRow(), finish.getPredecessor().getColumn());
             PlayerMove nextMove = new PlayerMove(finishCoord, playerId);
 
             lastMove(nextMove);
-
             System.out.println(this.toString());
+            finish = finish.getPredecessor();
         }
 
-        Coordinate finishCoord = new Coordinate(finish.getRow(), finish.getColumn());
-        PlayerMove nextMove = new PlayerMove(finishCoord, playerId);
-
-        lastMove(nextMove);
+        System.out.println(this.hasWonGame(playerId));
     }
 
     /**
@@ -94,15 +91,10 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
      * @return a PlayerMove object representing the next move.
      */
     public PlayerMove move() {
-        //Figure that out
         this.fewestSegmentsToVictory(playerId);
 
         Node start = graph.get(new Coordinate(-1, playerId == 1 ? 3 : 0));
         Node finish = graph.get(new Coordinate(-1, playerId == 1 ? 1 : 2));
-
-        while(finish.getPredecessor() != start){
-            finish = finish.getPredecessor();
-        }
 
         Coordinate finishCoord = new Coordinate(finish.getRow(), finish.getColumn());
         PlayerMove nextMove = new PlayerMove(finishCoord, playerId);
