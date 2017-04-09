@@ -168,6 +168,10 @@ public class Node {
         this.distance = distance;
     }
 
+    /**
+     * ToString for the Node Class
+     * @return
+     */
     @Override
     public String toString() {
         return "Player " + getPlayerOccupied() + " occupies a space at " +

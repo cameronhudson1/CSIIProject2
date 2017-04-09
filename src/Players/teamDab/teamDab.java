@@ -376,6 +376,16 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
         }
     }
 
+    /**
+     * Takes a current node, a start, and a finish and returns the list of neighbors at the end of that path created
+     * from the start node.
+     *
+     * @param n
+     * @param start
+     * @param finish
+     * @param id
+     * @return A list of all of the neighbors at the end of a path
+     */
     private List<Node> getDijkstraNeighbors(Node n, Node start, Node finish,
                                             int id) {
         List<Node> neighbors = new ArrayList<>();
@@ -410,6 +420,13 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
         return neighbors;
     }
 
+    /**
+     * Searches through the priorityQ list and removes (and returns) the item with the smallest distance from the
+     * start node
+     *
+     * @param priorityQ
+     * @return Node with the smallest distance from the start node
+     */
     private Node dequeueMin(List<Node> priorityQ) {
         Node minNode = priorityQ.get(0);  // start off with first one
         for (Node n : priorityQ) { // checks first one again...
