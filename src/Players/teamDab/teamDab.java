@@ -404,10 +404,10 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
      * Takes a current node, a start, and a finish and returns the list of neighbors at the end of that path created
      * from the start node.
      *
-     * @param n
-     * @param start
-     * @param finish
-     * @param id
+     * @param n Node to check Neighbors for
+     * @param start Start Node
+     * @param finish Finish Node
+     * @param id PlayerId
      * @return A list of all of the neighbors at the end of a path
      */
     private List<Node> getDijkstraNeighbors(Node n, Node start, Node finish,
@@ -448,7 +448,7 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
      * Searches through the priorityQ list and removes (and returns) the item with the smallest distance from the
      * start node
      *
-     * @param priorityQ
+     * @param priorityQ List of Nodes for Dijkstra's Al
      * @return Node with the smallest distance from the start node
      */
     private Node dequeueMin(List<Node> priorityQ) {
