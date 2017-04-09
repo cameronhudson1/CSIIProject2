@@ -1,7 +1,6 @@
 package Players.teamDab;
 
 import Interface.*;
-import com.sun.org.apache.xpath.internal.SourceTree;
 
 import java.util.*;
 
@@ -111,6 +110,10 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
     /**
      * Part 1 task that tests if a player has won the game
      * given a set of PREMOVEs.
+     *
+     * Does a breath-first search from start pointer node to ending pointer
+     * node. If a path exists, it returns true.
+     *
      * @param var1 player to test for a winning path.
      * @return boolean value indicating if the player has a winning path.
      */
@@ -226,6 +229,12 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
         return coord.getCol() != 0;
     }
 
+    /**
+     * An expedited process for checking if a coordinate is a on the border
+     * of the game board, and not a playable move.
+     * @param c the coordinate of interest
+     * @return if a coordinate is not on the border of the game board.
+     */
     private boolean isNotABoarder(Coordinate c) {
         return (isNotTopBorder(c) && isNotRightBorder(c) &&
                 isNotBottomBorder(c) && isNotLeftBorder(c));
@@ -305,6 +314,9 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
      * generate all legal moves, assuming that it is that
      * player's turn and given the current game status.
      *
+     * Loops through all of the spaces on the game board (except the ones on
+     * the border) and adds them to a list to return if it is an empty space.
+     *
      * @return a List of all legal PlayerMove objects. They do not have to be
      * in any particular order.
      */
@@ -325,6 +337,9 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
      * Part 2 task that computes the fewest segments that
      * a given player needs to add to complete a winning
      * path.
+     *
+     * An implementation of dijkstra's algorithm to this game board. returns
+     * the shortest distance.
      *
      * @param i the player of interest
      * @return the fewest number of segments to add to complete a path
@@ -353,6 +368,15 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
         return finish.getDistance() - 1;
     }
 
+    /**
+     * Initializes a list that stores the start and finish nodes as well as
+     * any node that is either (an empty space that is not on the border) or
+     * a space of that player.
+     *
+     * @param start the starting pointer node
+     * @param finish the finishing pointer node
+     * @param id the player id to check for
+     */
     private void initDijkstra(Node start, Node finish, int id) {
         start.setDistance(0);
         start.setPredecessor(null);
