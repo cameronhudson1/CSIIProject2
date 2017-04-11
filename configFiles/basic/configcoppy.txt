@@ -39,7 +39,7 @@ GAMES 1
 # Valid choices for AI Players include:
 # CARELESS, RANDOM, DEFENSIVE, OKPLAYER, GOODPLAYER, TOUGHPLAYER
 # as well as any module you create to play the game.
-PLAYERS teamDab,CARELESS
+PLAYERS HUMAN,RANDOM
 
 # TIMELIMIT is used to restrict player module computation.
 # It must be an integer in the range 1-100.

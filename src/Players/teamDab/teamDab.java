@@ -76,7 +76,8 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
         Node finish = graph.get(new Coordinate(-1, playerId == 1 ? 1 : 2));
 
         while(finish.getPredecessor() != start){
-            Coordinate finishCoord = new Coordinate(finish.getPredecessor().getRow(), finish.getPredecessor().getColumn());
+            Coordinate finishCoord = new Coordinate(finish.getPredecessor().
+                    getRow(), finish.getPredecessor().getColumn());
             PlayerMove nextMove = new PlayerMove(finishCoord, playerId);
 
             lastMove(nextMove);
@@ -90,8 +91,7 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
      * See lastMove. An initial, working version of this method is required for
      * Part 2. It may be refined subsequently.
      *
-     * Uses Dijkstra's algorithm to find the closest required move for the sortest path.  Creates an instance of the
-     * PlayerMove class to represent that move.  This PlayerMove is returned.
+     * Just plays the first legal move generated. Nothing fancy.
      *
      * @return a PlayerMove object representing the next move.
      */
