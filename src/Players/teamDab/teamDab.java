@@ -9,7 +9,8 @@ import java.util.*;
  * moves by the referee.
  * @author Mark Nash
  */
-public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
+public class teamDab implements PlayerModulePart1, PlayerModulePart2,
+        PlayerModulePart3 {
 
     /** The graph that stores the spots on the game board */
     private HashMap<Coordinate, Node> graph;
@@ -23,6 +24,7 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
     /** This player's player id */
     private int playerId;
 
+    /** A holder list for the vertexes usable for Dijkstra's algorithm run */
     private List<Node> dijVertexHolder;
 
     /**
@@ -266,41 +268,13 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
     }
 
     /**
-     * prints out the state of a game board for debugging and also fun
-     * purposes. If a player has won, you should be able to see all of the
-     * player's (either "X" for player 1, or "O" for player 2) symbols line
-     * up from one respective end of the board to the other.
-     * @return A string representation of the game board to be printed.
-     */
-    @Override
-    public String toString() {
-        String str = "";
-        for (int i = 0; i < max; i++) {
-            str += "\n";
-            for (int j = 0; j < max; j++) {
-                Node n = graph.get(new Coordinate(i, j));
-                if (n.getPlayerOccupied() == 1) {
-                    str += "X ";
-                }
-                else if (n.getPlayerOccupied() == 2) {
-                    str += "O ";
-                }
-                else {
-                    str += "  ";
-                }
-            }
-        }
-        return str;
-    }
-
-    /**
      * A helper method to put a coordinate-node pair in the graph, but also
      * assign the node's row and column values when we need to reverse get
      * from the graph.
      * @param c the coordinate of the node to put in the graph.
      * @param n the node to put in the graph.
      */
-    public void place(Coordinate c, Node n) {
+    private void place(Coordinate c, Node n) {
         graph.put(c, n);
         n.setRow(c.getRow());
         n.setColumn(c.getCol());
@@ -456,6 +430,52 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
             }
         }
         return priorityQ.remove(priorityQ.indexOf(minNode));
+    }
+
+    /**
+     *Part 3 task that computes whether the given player is guaranteed with
+     * optimal strategy to have won the game in no more than the given number
+     * of total moves, also given whose turn it is currently.
+     *
+     * @param i player to determine winnable status for
+     * @param i1 player whose turn it is currently
+     * @param i2 num of total moves by which the player of interest must be
+     *           able to guarantee victory to satisfy the requirement to return
+     *           a value of true
+     * @return boolean indicating whether it is possible for the indicated
+     * player to guarantee a win after the specified number of total moves.
+     */
+    @Override
+    public boolean isWinnable(int i, int i1, int i2) {
+        return false;
+    }
+
+    /**
+     * prints out the state of a game board for debugging and also fun
+     * purposes. If a player has won, you should be able to see all of the
+     * player's (either "X" for player 1, or "O" for player 2) symbols line
+     * up from one respective end of the board to the other.
+     * @return A string representation of the game board to be printed.
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("");
+        for (int i = 0; i < max; i++) {
+            sb.append("\n");
+            for (int j = 0; j < max; j++) {
+                Node n = graph.get(new Coordinate(i, j));
+                if (n.getPlayerOccupied() == 1) {
+                    sb.append("X ");
+                }
+                else if (n.getPlayerOccupied() == 2) {
+                    sb.append("O ");
+                }
+                else {
+                    sb.append("  ");
+                }
+            }
+        }
+        return sb.toString();
     }
 
     public static void main(String[] args) {
