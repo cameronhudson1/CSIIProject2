@@ -96,15 +96,12 @@ public class teamDab implements PlayerModulePart2, PlayerModulePart1 {
      * @return a PlayerMove object representing the next move.
      */
     public PlayerMove move() {
-        this.fewestSegmentsToVictory(playerId);
-
-        Node start = graph.get(new Coordinate(-1, playerId == 1 ? 3 : 0));
-        Node finish = graph.get(new Coordinate(-1, playerId == 1 ? 1 : 2));
-
-        Coordinate finishCoord = new Coordinate(finish.getRow(), finish.getColumn());
-        PlayerMove nextMove = new PlayerMove(finishCoord, playerId);
-
-        return nextMove;
+        for (PlayerMove p : allLegalMoves()) {
+            if (graph.get(p.getCoordinate()).getPlayerOccupied() == 0) {
+                return p;
+            }
+        }
+        return null;
     }
 
     /**
