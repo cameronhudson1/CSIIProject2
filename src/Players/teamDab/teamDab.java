@@ -433,7 +433,7 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
     }
 
     /**
-     *Part 3 task that computes whether the given player is guaranteed with
+     * Part 3 task that computes whether the given player is guaranteed with
      * optimal strategy to have won the game in no more than the given number
      * of total moves, also given whose turn it is currently.
      *
@@ -447,11 +447,11 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
      */
     @Override
     public boolean isWinnable(int userOfInt, int currTurn, int movesLeft) {
-        if(movesLeft == 0){
-            hasWonGame(userOfInt);
+        if (movesLeft == 0) {
+            return hasWonGame(userOfInt);
         }
-        else{
-            int otherPlayer = (userOfInt == 1 ? 2:1);
+        else {
+            int otherPlayer = (userOfInt == 1 ? 2 : 1);
 
             Node otherPlayerFinish = graph.get(new Coordinate(-1, 2));
             Node otherPlayerStart = graph.get(new Coordinate(-1, 0));
@@ -459,20 +459,25 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
             Node userOfIntStart = graph.get(new Coordinate(-1, 3));
 
             //It's User Of Int's Turn
-            if(userOfInt == currTurn){
+            if (userOfInt == currTurn) {
                 fewestSegmentsToVictory(otherPlayer);
                 Node currNodeOther = otherPlayerFinish;
-                while(currNodeOther.getPredecessor() != otherPlayerStart){
+                while (currNodeOther.getPredecessor() != otherPlayerStart) {
                     currNodeOther = currNodeOther.getPredecessor();
                     currNodeOther.setUserFlag(otherPlayer);
                 }
             }
 
             //It Ain't
-            else if(userOfInt != currTurn){
+            else if (userOfInt != currTurn) {
                 fewestSegmentsToVictory(userOfInt);
-
+                Node currNodeOther = userOfIntFinish;
+                while (currNodeOther.getPredecessor() != userOfIntStart) {
+                    currNodeOther = currNodeOther.getPredecessor();
+                    currNodeOther.setUserFlag(otherPlayer);
+                }
             }
+
         }
         return false;
     }
@@ -506,6 +511,14 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
     }
 
     public static void main(String[] args) {
+        teamDab t = new teamDab();
+        t.initPlayer(3, 1);
+        t.lastMove(new PlayerMove(new Coordinate(1,1),2));
+        t.lastMove(new PlayerMove(new Coordinate(2,4),1));
+        t.lastMove(new PlayerMove(new Coordinate(5,3),2));
+        t.lastMove(new PlayerMove(new Coordinate(3,1),1));
+        System.out.println(t);
+        /*
         teamDab t = new teamDab();
         t.initPlayer(6, 2);
         String str = "PREMOVE 7,1,1\n" +
@@ -544,5 +557,6 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         System.out.println(t.fewestSegmentsToVictory(2));
 
         t.otherPlayerInvalidated();
+        */
     }
 }
