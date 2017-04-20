@@ -65,11 +65,13 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
      * Indicates that the other player has been invalidated.
      * Required task for Part 2.
      *
-     * Called by Referee when one player has been Invalidated.  This function will call all of the required moves for
-     * the other player to win.
+     * Called by Referee when one player has been Invalidated.
+     * This function will call all of the required moves for the other player
+     * to win.
      *
-     * Follows the predecessors on Dijkstra's algorithm back through the path.  At each required move (predecessor),
-     * lastMove() is called to connect that node to it's neighbors.
+     * Follows the predecessors on Dijkstra's algorithm back through the path
+     * At each required move (predecessor), lastMove() is called to connect
+     * that node to it's neighbors.
      */
     public void otherPlayerInvalidated() {
         this.fewestSegmentsToVictory(playerId);
@@ -372,8 +374,8 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
     }
 
     /**
-     * Takes a current node, a start, and a finish and returns the list of neighbors at the end of that path created
-     * from the start node.
+     * Takes a current node, a start, and a finish and returns the list of
+     * neighbors at the end of that path created from the start node.
      *
      * @param n Node to check Neighbors for
      * @param start Start Node
@@ -416,8 +418,8 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
     }
 
     /**
-     * Searches through the priorityQ list and removes (and returns) the item with the smallest distance from the
-     * start node
+     * Searches through the priorityQ list and removes (and returns) the item
+     * with the smallest distance from the start node
      *
      * @param priorityQ List of Nodes for Dijkstra's Al
      * @return Node with the smallest distance from the start node
@@ -439,9 +441,9 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
      *
      * @param userOfInt player to determine winnable status for
      * @param currTurn player whose turn it is currently
-     * @param movesLeft num of total moves by which the player of interest must be
-     *           able to guarantee victory to satisfy the requirement to return
-     *           a value of true
+     * @param movesLeft num of total moves by which the player of interest must
+     *                  be able to guarantee victory to satisfy the
+     *                  requirement to return a value of true
      * @return boolean indicating whether it is possible for the indicated
      * player to guarantee a win after the specified number of total moves.
      */
@@ -483,6 +485,10 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         return false;
     }
 
+    /**
+     * Creates a deep copy.
+     * @return the deep copy reference
+     */
     private teamDab createCopy() {
         teamDab copy = new teamDab();
         copy.initPlayer(dim, playerId);
@@ -522,6 +528,7 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
      * purposes. If a player has won, you should be able to see all of the
      * player's (either "X" for player 1, or "O" for player 2) symbols line
      * up from one respective end of the board to the other.
+     *
      * @return A string representation of the game board to be printed.
      */
     @Override
