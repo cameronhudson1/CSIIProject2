@@ -451,6 +451,7 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
             return hasWonGame(userOfInt);
         }
         else {
+            teamDab copy = createCopy();
             int otherPlayer = (userOfInt == 1 ? 2 : 1);
 
             Node otherPlayerFinish = graph.get(new Coordinate(-1, 2));
@@ -480,6 +481,40 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
 
         }
         return false;
+    }
+
+    private teamDab createCopy() {
+        teamDab copy = new teamDab();
+        copy.initPlayer(dim, playerId);
+        // Make sure each node is an exact deep copy
+        for (int i = 0; i < max; i++) {
+            for (int j = 0; j < max; j++) {
+                Node now = copy.graph.get(new Coordinate(i, j));
+                Node old = graph.get(new Coordinate(i, j));
+                now.setPlayerOccupied(graph.get(new Coordinate(i, j))
+                                                          .getPlayerOccupied());
+                // Add the appropriate neighbors to the node's neighbor list
+                for (Node n : old.getNeighbors()) {
+                    if (n == null) {
+                        continue;
+                    }
+                    now.getNeighbors().add(copy.graph.get(new Coordinate
+                                                  (n.getRow(), n.getColumn())));
+                }
+            }
+        }
+        for (int k = 0; k < 4; k++) {
+            Node old = graph.get(new Coordinate(-1, k));
+            Node now = copy.graph.get(new Coordinate(-1, k));
+            for (Node n : old.getNeighbors()) {
+                if (n == null) {
+                    continue;
+                }
+                now.getNeighbors().add(copy.graph.get(new Coordinate(
+                        n.getRow(), n.getColumn())));
+            }
+        }
+        return copy;
     }
 
     /**
@@ -518,6 +553,8 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         t.lastMove(new PlayerMove(new Coordinate(5,3),2));
         t.lastMove(new PlayerMove(new Coordinate(3,1),1));
         System.out.println(t);
+        teamDab c = t.createCopy();
+        System.out.println(c);
         /*
         teamDab t = new teamDab();
         t.initPlayer(6, 2);
