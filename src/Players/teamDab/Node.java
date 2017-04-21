@@ -198,6 +198,4 @@ public class Node {
         return "Player " + getPlayerOccupied() + " occupies a space at " +
                 "row: " + this.getRow() + " and at column: " + this.getColumn();
     }
-
-
 }
