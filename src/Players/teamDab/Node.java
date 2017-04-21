@@ -30,6 +30,9 @@ public class Node {
 
     private int distance;
 
+    /** A flag used to determine if this node is on another player's path to victory */
+    private int userFlag;
+
     /**
      * Constructor for Node class. Sets playerOccupied to 0 initially, loads
      * its neighbors as null for the four corners.
@@ -45,6 +48,7 @@ public class Node {
         this.column = -2;
         this.predecessor = null;
         this.distance = Integer.MAX_VALUE;
+        this.userFlag = 0;
     }
 
     /**
@@ -78,6 +82,13 @@ public class Node {
         this.playerOccupied = player;
     }
 
+    /**
+     * Setter for userFlag field.  Used to flag other spots in isWinnable method.
+     * @param userFlag
+     */
+    public void setUserFlag(int userFlag){
+        this.userFlag = userFlag;
+    }
     /**
      * Sets the top neighbor to the node and sets the node to
      * the top neighbor's bottom neighbor.

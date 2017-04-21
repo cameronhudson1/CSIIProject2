@@ -437,16 +437,43 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
      * optimal strategy to have won the game in no more than the given number
      * of total moves, also given whose turn it is currently.
      *
-     * @param i player to determine winnable status for
-     * @param i1 player whose turn it is currently
-     * @param i2 num of total moves by which the player of interest must be
+     * @param userOfInt player to determine winnable status for
+     * @param currTurn player whose turn it is currently
+     * @param movesLeft num of total moves by which the player of interest must be
      *           able to guarantee victory to satisfy the requirement to return
      *           a value of true
      * @return boolean indicating whether it is possible for the indicated
      * player to guarantee a win after the specified number of total moves.
      */
     @Override
-    public boolean isWinnable(int i, int i1, int i2) {
+    public boolean isWinnable(int userOfInt, int currTurn, int movesLeft) {
+        if(movesLeft == 0){
+            hasWonGame(userOfInt);
+        }
+        else{
+            int otherPlayer = (userOfInt == 1 ? 2:1);
+
+            Node otherPlayerFinish = graph.get(new Coordinate(-1, 2));
+            Node otherPlayerStart = graph.get(new Coordinate(-1, 0));
+            Node userOfIntFinish = graph.get(new Coordinate(-1, 1));
+            Node userOfIntStart = graph.get(new Coordinate(-1, 3));
+
+            //It's User Of Int's Turn
+            if(userOfInt == currTurn){
+                fewestSegmentsToVictory(otherPlayer);
+                Node currNodeOther = otherPlayerFinish;
+                while(currNodeOther.getPredecessor() != otherPlayerStart){
+                    currNodeOther = currNodeOther.getPredecessor();
+                    currNodeOther.setUserFlag(otherPlayer);
+                }
+            }
+
+            //It Ain't
+            else if(userOfInt != currTurn){
+                fewestSegmentsToVictory(userOfInt);
+
+            }
+        }
         return false;
     }
 
