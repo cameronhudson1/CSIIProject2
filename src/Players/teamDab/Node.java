@@ -88,6 +88,15 @@ public class Node {
     public void setUserFlag(int userFlag){
         this.userFlag = userFlag;
     }
+
+    /**
+     * Gets userFlag
+     * @return
+     */
+    public int getUserFlag(){
+        return this.userFlag;
+    }
+
     /**
      * Sets the top neighbor to the node and sets the node to
      * the top neighbor's bottom neighbor.

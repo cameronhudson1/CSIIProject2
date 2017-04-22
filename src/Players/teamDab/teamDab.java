@@ -48,6 +48,32 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
     }
 
     /**
+    public teamDab(teamDab other){
+        this.dim = other.dim;
+        this.max = other.max;
+        this.playerId = other.playerId;
+        this.dijVertexHolder = other.copy(other.dijVertexHolder);
+        this.graph = other.copy(other.graph);
+    }
+
+    public HashMap copy(HashMap<Coordinate, Node> spaghetti){
+        HashMap<Coordinate, Node> other = new HashMap<>();
+        for(Coordinate n : other.keySet()){
+            other.put(n, spaghetti.get(n));
+        }
+        return other;
+    }
+
+    public List<Node> copy(List<Node> dijVertexHolder){
+        List<Node> other = new LinkedList<Node>();
+        for(Node n : dijVertexHolder){
+            other.add(n);
+        }
+        return other;
+    }
+     */
+
+    /**
      * Method called after every move of the game. Used to keep internal game
      * state current. Required task for Part 1. Note that the engine will only
      * call this method after verifying the validity of the current move. Thus,
@@ -448,12 +474,17 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
      * player to guarantee a win after the specified number of total moves.
      */
     @Override
-    public boolean isWinnable(int userOfInt, int currTurn, int movesLeft) {
+    public boolean isWinnable(int userOfInt, int currTurn, int movesLeft){
+        teamDab temp = this.createCopy();
+        Boolean weGotAPath = temp.isWinnableHelper(userOfInt, currTurn, movesLeft);
+        return weGotAPath;
+    }
+
+    public Boolean isWinnableHelper(int userOfInt, int currTurn, int movesLeft) {
         if (movesLeft == 0) {
             return hasWonGame(userOfInt);
         }
         else {
-            teamDab copy = createCopy();
             int otherPlayer = (userOfInt == 1 ? 2 : 1);
 
             Node otherPlayerFinish = graph.get(new Coordinate(-1, 2));
@@ -461,29 +492,112 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
             Node userOfIntFinish = graph.get(new Coordinate(-1, 1));
             Node userOfIntStart = graph.get(new Coordinate(-1, 3));
 
+            //TESTING
+            System.out.println(this);
+
             //It's User Of Int's Turn
             if (userOfInt == currTurn) {
+                //Trace otherPlayer's shortest path & set flags
                 fewestSegmentsToVictory(otherPlayer);
                 Node currNodeOther = otherPlayerFinish;
                 while (currNodeOther.getPredecessor() != otherPlayerStart) {
                     currNodeOther = currNodeOther.getPredecessor();
                     currNodeOther.setUserFlag(otherPlayer);
                 }
+
+                //Trace userOfInt's shortest path & place segment
+                fewestSegmentsToVictory(userOfInt);
+                Node currNodeUserOfInt = userOfIntFinish;
+                while(currNodeUserOfInt.getPredecessor() != userOfIntStart){
+                    currNodeUserOfInt = currNodeUserOfInt.getPredecessor();
+                    if(currNodeUserOfInt.getUserFlag() == otherPlayer){
+                        int xcoord = currNodeUserOfInt.getRow();
+                        int ycoord = currNodeUserOfInt.getColumn();
+                        PlayerMove p = new PlayerMove(new Coordinate(xcoord, ycoord), userOfInt);
+                        this.lastMove(p);
+                    }
+                }
+
+                //Trace otherPlayer's shortest path & reset flags
+                fewestSegmentsToVictory(otherPlayer);
+                currNodeOther = otherPlayerFinish;
+                while (currNodeOther.getPredecessor() != otherPlayerStart) {
+                    currNodeOther = currNodeOther.getPredecessor();
+                    currNodeOther.setUserFlag(0);
+                }
+
+                return isWinnable(userOfInt, otherPlayer, movesLeft-1);
             }
 
             //It Ain't
             else if (userOfInt != currTurn) {
+                //Trace UserOfInt's shortest path & set flags
                 fewestSegmentsToVictory(userOfInt);
-                Node currNodeOther = userOfIntFinish;
-                while (currNodeOther.getPredecessor() != userOfIntStart) {
-                    currNodeOther = currNodeOther.getPredecessor();
-                    currNodeOther.setUserFlag(otherPlayer);
+                Node currNodeUserOfint = userOfIntFinish;
+                while (currNodeUserOfint.getPredecessor() != userOfIntStart) {
+                    currNodeUserOfint = currNodeUserOfint.getPredecessor();
+                    currNodeUserOfint.setUserFlag(userOfInt);
                 }
+
+                //Trace OtherPlayer's shortest path & place segment
+                fewestSegmentsToVictory(otherPlayer);
+                Node currNodeOther = otherPlayerFinish;
+                while(currNodeOther.getPredecessor() != otherPlayerStart){
+                    currNodeOther = currNodeOther.getPredecessor();
+                    if(currNodeOther.getUserFlag() == userOfInt){
+                        int xcoord = currNodeOther.getRow();
+                        int ycoord = currNodeOther.getColumn();
+                        PlayerMove p = new PlayerMove(new Coordinate(xcoord, ycoord), otherPlayer);
+                        this.lastMove(p);
+                    }
+                }
+
+                //Trace UserOfInt's shortest path & reset flags
+                fewestSegmentsToVictory(userOfInt);
+                currNodeUserOfint = userOfIntFinish;
+                while(currNodeUserOfint.getPredecessor() != userOfIntStart){
+                    currNodeUserOfint = currNodeUserOfint.getPredecessor();
+                    currNodeUserOfint.setUserFlag(0);
+                }
+
+                return isWinnable(userOfInt, userOfInt, movesLeft);
             }
 
         }
         return false;
     }
+
+    public Boolean isWinnableHelper2(int userOfInt, int currTurn, int movesLeft) {
+        if (movesLeft == 0) {
+            return hasWonGame(userOfInt);
+        }
+        else {
+            int otherPlayer = (userOfInt == 1 ? 2 : 1);
+
+            Node otherPlayerFinish = graph.get(new Coordinate(-1, 2));
+            Node otherPlayerStart = graph.get(new Coordinate(-1, 0));
+            Node userOfIntFinish = graph.get(new Coordinate(-1, 1));
+            Node userOfIntStart = graph.get(new Coordinate(-1, 3));
+
+            //TESTING
+            System.out.println(this);
+
+            //It's User Of Int's Turn
+            if (userOfInt == currTurn) {
+                PlayerMove[] succ = allLegalMoves();
+                return isWinnable(userOfInt, otherPlayer, movesLeft-1);
+            }
+
+            //It Ain't
+            else if (userOfInt != currTurn) {
+
+                return isWinnable(userOfInt, userOfInt, movesLeft);
+            }
+
+        }
+        return false;
+    }
+
 
     /**
      * Creates a deep copy.
@@ -522,6 +636,7 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         }
         return copy;
     }
+
 
     /**
      * prints out the state of a game board for debugging and also fun
