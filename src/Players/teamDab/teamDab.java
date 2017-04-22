@@ -596,9 +596,10 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
             else if (userOfInt != currTurn) {
                 ArrayList<teamDab> successors = getSuccessors(this, otherPlayer);
                 for(teamDab b : successors){
-                    isPath = isPath || b.isWinnable(userOfInt, userOfInt, movesLeft-1);
+                    if(b.isWinnable(userOfInt, userOfInt, movesLeft-1) == false){
+                        return b.isWinnable(userOfInt, otherPlayer, movesLeft-1);
+                    }
                 }
-                return isPath;
             }
         }
         return false;
