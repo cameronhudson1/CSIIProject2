@@ -47,6 +47,10 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         initGraph();
     }
 
+    public void setPlayerId(int p){
+        this.playerId = p;
+    }
+
     /**
     public teamDab(teamDab other){
         this.dim = other.dim;
@@ -476,12 +480,13 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
     @Override
     public boolean isWinnable(int userOfInt, int currTurn, int movesLeft){
         teamDab temp = this.createCopy();
-        Boolean weGotAPath = temp.isWinnableHelper(userOfInt, currTurn, movesLeft);
+        Boolean weGotAPath = temp.isWinnableHelper2(userOfInt, currTurn, movesLeft, false);
         return weGotAPath;
     }
 
     public Boolean isWinnableHelper(int userOfInt, int currTurn, int movesLeft) {
         if (movesLeft == 0) {
+
             return hasWonGame(userOfInt);
         }
         else {
@@ -567,35 +572,47 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         return false;
     }
 
-    public Boolean isWinnableHelper2(int userOfInt, int currTurn, int movesLeft) {
+    public Boolean isWinnableHelper2(int userOfInt, int currTurn, int movesLeft, Boolean isPath) {
         if (movesLeft == 0) {
+            //TESTING
+            System.out.println(this);
             return hasWonGame(userOfInt);
         }
         else {
             int otherPlayer = (userOfInt == 1 ? 2 : 1);
-
-            Node otherPlayerFinish = graph.get(new Coordinate(-1, 2));
-            Node otherPlayerStart = graph.get(new Coordinate(-1, 0));
-            Node userOfIntFinish = graph.get(new Coordinate(-1, 1));
-            Node userOfIntStart = graph.get(new Coordinate(-1, 3));
-
             //TESTING
             System.out.println(this);
 
             //It's User Of Int's Turn
             if (userOfInt == currTurn) {
-                PlayerMove[] succ = allLegalMoves();
-                return isWinnable(userOfInt, otherPlayer, movesLeft-1);
+                ArrayList<teamDab> successors = getSuccessors(this, userOfInt);
+                for(teamDab b : successors){
+                    isPath = isPath || b.isWinnable(userOfInt, otherPlayer, movesLeft-1);
+                }
+                return isPath;
             }
 
             //It Ain't
             else if (userOfInt != currTurn) {
-
-                return isWinnable(userOfInt, userOfInt, movesLeft);
+                ArrayList<teamDab> successors = getSuccessors(this, otherPlayer);
+                for(teamDab b : successors){
+                    isPath = isPath || b.isWinnable(userOfInt, userOfInt, movesLeft-1);
+                }
+                return isPath;
             }
-
         }
         return false;
+    }
+
+    public ArrayList<teamDab> getSuccessors(teamDab b, int user){
+        b.setPlayerId(user);
+        ArrayList<teamDab> successors = new ArrayList<>();
+        for(PlayerMove p : b.allLegalMoves()){
+            teamDab temp = b.createCopy();
+            temp.lastMove(p);
+            successors.add(temp);
+        }
+        return successors;
     }
 
 
