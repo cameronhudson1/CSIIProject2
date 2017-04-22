@@ -65,11 +65,13 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
      * Indicates that the other player has been invalidated.
      * Required task for Part 2.
      *
-     * Called by Referee when one player has been Invalidated.  This function will call all of the required moves for
-     * the other player to win.
+     * Called by Referee when one player has been Invalidated.
+     * This function will call all of the required moves for the other player
+     * to win.
      *
-     * Follows the predecessors on Dijkstra's algorithm back through the path.  At each required move (predecessor),
-     * lastMove() is called to connect that node to it's neighbors.
+     * Follows the predecessors on Dijkstra's algorithm back through the path
+     * At each required move (predecessor), lastMove() is called to connect
+     * that node to it's neighbors.
      */
     public void otherPlayerInvalidated() {
         this.fewestSegmentsToVictory(playerId);
@@ -372,8 +374,8 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
     }
 
     /**
-     * Takes a current node, a start, and a finish and returns the list of neighbors at the end of that path created
-     * from the start node.
+     * Takes a current node, a start, and a finish and returns the list of
+     * neighbors at the end of that path created from the start node.
      *
      * @param n Node to check Neighbors for
      * @param start Start Node
@@ -416,8 +418,8 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
     }
 
     /**
-     * Searches through the priorityQ list and removes (and returns) the item with the smallest distance from the
-     * start node
+     * Searches through the priorityQ list and removes (and returns) the item
+     * with the smallest distance from the start node
      *
      * @param priorityQ List of Nodes for Dijkstra's Al
      * @return Node with the smallest distance from the start node
@@ -433,25 +435,26 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
     }
 
     /**
-     *Part 3 task that computes whether the given player is guaranteed with
+     * Part 3 task that computes whether the given player is guaranteed with
      * optimal strategy to have won the game in no more than the given number
      * of total moves, also given whose turn it is currently.
      *
      * @param userOfInt player to determine winnable status for
      * @param currTurn player whose turn it is currently
-     * @param movesLeft num of total moves by which the player of interest must be
-     *           able to guarantee victory to satisfy the requirement to return
-     *           a value of true
+     * @param movesLeft num of total moves by which the player of interest must
+     *                  be able to guarantee victory to satisfy the
+     *                  requirement to return a value of true
      * @return boolean indicating whether it is possible for the indicated
      * player to guarantee a win after the specified number of total moves.
      */
     @Override
     public boolean isWinnable(int userOfInt, int currTurn, int movesLeft) {
-        if(movesLeft == 0){
-            hasWonGame(userOfInt);
+        if (movesLeft == 0) {
+            return hasWonGame(userOfInt);
         }
-        else{
-            int otherPlayer = (userOfInt == 1 ? 2:1);
+        else {
+            teamDab copy = createCopy();
+            int otherPlayer = (userOfInt == 1 ? 2 : 1);
 
             Node otherPlayerFinish = graph.get(new Coordinate(-1, 2));
             Node otherPlayerStart = graph.get(new Coordinate(-1, 0));
@@ -459,22 +462,65 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
             Node userOfIntStart = graph.get(new Coordinate(-1, 3));
 
             //It's User Of Int's Turn
-            if(userOfInt == currTurn){
+            if (userOfInt == currTurn) {
                 fewestSegmentsToVictory(otherPlayer);
                 Node currNodeOther = otherPlayerFinish;
-                while(currNodeOther.getPredecessor() != otherPlayerStart){
+                while (currNodeOther.getPredecessor() != otherPlayerStart) {
                     currNodeOther = currNodeOther.getPredecessor();
                     currNodeOther.setUserFlag(otherPlayer);
                 }
             }
 
             //It Ain't
-            else if(userOfInt != currTurn){
+            else if (userOfInt != currTurn) {
                 fewestSegmentsToVictory(userOfInt);
-
+                Node currNodeOther = userOfIntFinish;
+                while (currNodeOther.getPredecessor() != userOfIntStart) {
+                    currNodeOther = currNodeOther.getPredecessor();
+                    currNodeOther.setUserFlag(otherPlayer);
+                }
             }
+
         }
         return false;
+    }
+
+    /**
+     * Creates a deep copy.
+     * @return the deep copy reference
+     */
+    private teamDab createCopy() {
+        teamDab copy = new teamDab();
+        copy.initPlayer(dim, playerId);
+        // Make sure each node is an exact deep copy
+        for (int i = 0; i < max; i++) {
+            for (int j = 0; j < max; j++) {
+                Node now = copy.graph.get(new Coordinate(i, j));
+                Node old = graph.get(new Coordinate(i, j));
+                now.setPlayerOccupied(graph.get(new Coordinate(i, j))
+                                                          .getPlayerOccupied());
+                // Add the appropriate neighbors to the node's neighbor list
+                for (Node n : old.getNeighbors()) {
+                    if (n == null) {
+                        continue;
+                    }
+                    now.getNeighbors().add(copy.graph.get(new Coordinate
+                                                  (n.getRow(), n.getColumn())));
+                }
+            }
+        }
+        for (int k = 0; k < 4; k++) {
+            Node old = graph.get(new Coordinate(-1, k));
+            Node now = copy.graph.get(new Coordinate(-1, k));
+            for (Node n : old.getNeighbors()) {
+                if (n == null) {
+                    continue;
+                }
+                now.getNeighbors().add(copy.graph.get(new Coordinate(
+                        n.getRow(), n.getColumn())));
+            }
+        }
+        return copy;
     }
 
     /**
@@ -482,6 +528,7 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
      * purposes. If a player has won, you should be able to see all of the
      * player's (either "X" for player 1, or "O" for player 2) symbols line
      * up from one respective end of the board to the other.
+     *
      * @return A string representation of the game board to be printed.
      */
     @Override
@@ -506,6 +553,16 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
     }
 
     public static void main(String[] args) {
+        teamDab t = new teamDab();
+        t.initPlayer(3, 1);
+        t.lastMove(new PlayerMove(new Coordinate(1,1),2));
+        t.lastMove(new PlayerMove(new Coordinate(2,4),1));
+        t.lastMove(new PlayerMove(new Coordinate(5,3),2));
+        t.lastMove(new PlayerMove(new Coordinate(3,1),1));
+        System.out.println(t);
+        teamDab c = t.createCopy();
+        System.out.println(c);
+        /*
         teamDab t = new teamDab();
         t.initPlayer(6, 2);
         String str = "PREMOVE 7,1,1\n" +
@@ -544,5 +601,6 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         System.out.println(t.fewestSegmentsToVictory(2));
 
         t.otherPlayerInvalidated();
+        */
     }
 }

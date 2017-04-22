@@ -66,8 +66,7 @@ public class Node {
     }
 
     /**
-     * Accessor Method for getting a predecessor.
-     * @return
+     * @return the predecessor
      */
 
     public Node getPredecessor(){
@@ -83,8 +82,8 @@ public class Node {
     }
 
     /**
-     * Setter for userFlag field.  Used to flag other spots in isWinnable method.
-     * @param userFlag
+     * Setter for userFlag field. Used to flag other spots in isWinnable method.
+     * @param userFlag userFlag to set
      */
     public void setUserFlag(int userFlag){
         this.userFlag = userFlag;
@@ -152,7 +151,7 @@ public class Node {
     }
 
     /**
-     * Sets the row field
+     * Setter for the row field
      * @param row the row number to be set
      */
     public void setRow(int row) {
@@ -160,34 +159,43 @@ public class Node {
     }
 
     /**
-     * sets the column field
+     * Setter for the column field
      * @param column the column number to be set
      */
     public void setColumn(int column) {
         this.column = column;
     }
 
+    /**
+     * @return the distance field
+     */
     public int getDistance() {
         return distance;
     }
 
+    /**
+     * Setter for the predecessor field
+     * @param predecessor predecessor to set
+     */
     public void setPredecessor(Node predecessor) {
         this.predecessor = predecessor;
     }
 
+    /**
+     * Setter for the distance field
+     * @param distance distance to set
+     */
     public void setDistance(int distance) {
         this.distance = distance;
     }
 
     /**
      * ToString for the Node Class
-     * @return
+     * @return a string representing pertinent information about this class.
      */
     @Override
     public String toString() {
         return "Player " + getPlayerOccupied() + " occupies a space at " +
                 "row: " + this.getRow() + " and at column: " + this.getColumn();
     }
-
-
 }
