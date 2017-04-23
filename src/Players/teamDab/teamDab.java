@@ -575,14 +575,10 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
 
     public Boolean isWinnableHelper2(int userOfInt, int currTurn, int movesLeft, Boolean isPath) {
         if (movesLeft == 0) {
-            //TESTING
-            System.out.println(this);
             return hasWonGame(userOfInt);
         }
         else {
             int otherPlayer = (userOfInt == 1 ? 2 : 1);
-            //TESTING
-            System.out.println(this);
 
             //It's User Of Int's Turn
             if (userOfInt == currTurn) {
