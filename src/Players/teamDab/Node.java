@@ -1,6 +1,9 @@
 package Players.teamDab;
 
+import Interface.Coordinate;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * A node class to represent every space on the game board. There can be a
@@ -26,12 +29,11 @@ public class Node {
     /** Stores the column in the graph. -2 if not yet put in the graph */
     private int column;
 
+    /** A predecessor reference that is used to build a path using Dijkstra's */
     private Node predecessor;
 
+    /** The shortest possible distance from the start node using Dijkstra's */
     private int distance;
-
-    /** A flag used to determine if this node is on another player's path to victory */
-    private int userFlag;
 
     /**
      * Constructor for Node class. Sets playerOccupied to 0 initially, loads
@@ -48,7 +50,29 @@ public class Node {
         this.column = -2;
         this.predecessor = null;
         this.distance = Integer.MAX_VALUE;
-        this.userFlag = 0;
+    }
+
+    /**
+     * Creates a deep copy of a generic node. Used while making a deep copy
+     * of the main class.
+     *
+     * @param n the node to copy
+     * @param newGraph the graph of the new main class instance
+     */
+    public void copy(Node n, HashMap<Coordinate, Node> newGraph) {
+        n.playerOccupied = this.playerOccupied;
+        n.row = this.row;
+        n.column = this.column;
+        for (int i = 0; i < neighbors.size(); i++) {
+            Node neighbor = n.neighbors.get(i);
+            if (neighbor == null) {
+                this.neighbors.set(i, null);
+            }
+            else {
+                this.neighbors.set(i, newGraph.get(new
+                        Coordinate(neighbor.getRow(), neighbor.getColumn())));
+            }
+        }
     }
 
     /**
@@ -68,7 +92,6 @@ public class Node {
     /**
      * @return the predecessor
      */
-
     public Node getPredecessor(){
         return this.predecessor;
     }
@@ -79,22 +102,6 @@ public class Node {
      */
     public void setPlayerOccupied(int player) {
         this.playerOccupied = player;
-    }
-
-    /**
-     * Setter for userFlag field. Used to flag other spots in isWinnable method.
-     * @param userFlag userFlag to set
-     */
-    public void setUserFlag(int userFlag){
-        this.userFlag = userFlag;
-    }
-
-    /**
-     * Gets userFlag
-     * @return
-     */
-    public int getUserFlag(){
-        return this.userFlag;
     }
 
     /**
@@ -196,6 +203,32 @@ public class Node {
      */
     public void setDistance(int distance) {
         this.distance = distance;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof  Node) {
+            Node n = (Node) obj;
+            if (playerOccupied != n.playerOccupied ||
+                row != n.row ||
+                column != n.column ||
+                neighbors.size() != n.neighbors.size()) {
+                return false;
+            }
+            for (int i = 0; i < neighbors.size(); i++) {
+                if (neighbors.get(i) == null) {
+                   if (n.neighbors.get(i) == null) {
+                       continue;
+                   }
+                   return false;
+                }
+                else if (neighbors.get(i).playerOccupied != n.neighbors.get
+                        (i).playerOccupied) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
