@@ -1,6 +1,7 @@
 package Players.teamDab;
 
 import Interface.*;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.util.*;
 
@@ -586,23 +587,29 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
             //It's User Of Int's Turn
             if (userOfInt == currTurn) {
                 ArrayList<teamDab> successors = getSuccessors(this, userOfInt);
-                for(teamDab b : successors){
-                    isPath = isPath || b.isWinnable(userOfInt, otherPlayer, movesLeft-1);
+                for (teamDab b : successors) {
+                    if(b.isWinnable(userOfInt, otherPlayer, movesLeft - 1) == true){
+                        return true;
+                    }
+                    //isPath = isPath || b.isWinnable(userOfInt, otherPlayer, movesLeft - 1);
                 }
-                return isPath;
+                return false;
             }
 
             //It Ain't
-            else if (userOfInt != currTurn) {
+            else {
                 ArrayList<teamDab> successors = getSuccessors(this, otherPlayer);
-                for(teamDab b : successors){
-                    if(b.isWinnable(userOfInt, userOfInt, movesLeft-1) == false){
-                        return b.isWinnable(userOfInt, otherPlayer, movesLeft-1);
+                Boolean flag = true;
+                for (teamDab b : successors) {
+                    if(b.isWinnable(userOfInt, userOfInt, movesLeft - 1) == false){
+                        flag = false;
+                        return false;
                     }
+                    //isPath = isPath || b.isWinnable(userOfInt, userOfInt, movesLeft - 1);
                 }
+                return flag;
             }
         }
-        return false;
     }
 
     public ArrayList<teamDab> getSuccessors(teamDab b, int user){
