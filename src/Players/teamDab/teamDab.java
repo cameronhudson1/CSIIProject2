@@ -119,12 +119,14 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         Node otherPlayerStart;
         Node userOfIntFinish;
         Node userOfIntStart;
+
         if(this.playerId == 1) {
             otherPlayerFinish = graph.get(new Coordinate(-1, 2));
             otherPlayerStart = graph.get(new Coordinate(-1, 0));
             userOfIntFinish = graph.get(new Coordinate(-1, 1));
             userOfIntStart = graph.get(new Coordinate(-1, 3));
         }
+
         else{
             userOfIntFinish = graph.get(new Coordinate(-1, 2));
             userOfIntStart = graph.get(new Coordinate(-1, 0));
@@ -143,13 +145,14 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         //Trace userOfInt's shortest path & place segment
         fewestSegmentsToVictory(this.playerId);
         Node currNodeUserOfInt = userOfIntFinish;
-        PlayerMove p = null;
+        ArrayList<PlayerMove> moves = new ArrayList<>();
         while (currNodeUserOfInt.getPredecessor() != userOfIntStart) {
             currNodeUserOfInt = currNodeUserOfInt.getPredecessor();
             if (currNodeUserOfInt.getUserFlag() == otherPlayer) {
                 int xcoord = currNodeUserOfInt.getRow();
                 int ycoord = currNodeUserOfInt.getColumn();
-                p = new PlayerMove(new Coordinate(xcoord, ycoord), this.playerId);
+                PlayerMove p = new PlayerMove(new Coordinate(xcoord, ycoord), this.playerId);
+                moves.add(p);
             }
         }
 
@@ -161,7 +164,102 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
             currNodeOther.setUserFlag(0);
         }
 
-        return p;
+        if(moves.size() > 1){
+            for(PlayerMove move : moves){
+                int ycoord = move.getCoordinate().getCol();
+                if(ycoord % 2 == 1){
+                    return move;
+                }
+            }
+        }
+
+        return moves.get(0);
+
+        //Prioritize building in the direction of movement
+
+
+        /*
+        if(playerId == 1){
+            //Trace otherPlayer's shortest path & set flags
+            fewestSegmentsToVictory(otherPlayer);
+            Node currNodeOther = otherPlayerFinish;
+            while (currNodeOther.getPredecessor() != otherPlayerStart) {
+                currNodeOther = currNodeOther.getPredecessor();
+                currNodeOther.setUserFlag(otherPlayer);
+            }
+
+            //Trace userOfInt's shortest path & place segment
+            fewestSegmentsToVictory(this.playerId);
+            Node currNodeUserOfInt = userOfIntFinish;
+            PlayerMove p = null;
+            while (currNodeUserOfInt.getPredecessor() != userOfIntStart) {
+                currNodeUserOfInt = currNodeUserOfInt.getPredecessor();
+                if (currNodeUserOfInt.getUserFlag() == otherPlayer) {
+                    int xcoord = currNodeUserOfInt.getRow();
+                    int ycoord = currNodeUserOfInt.getColumn();
+                    p = new PlayerMove(new Coordinate(xcoord, ycoord), this.playerId);
+                }
+            }
+
+            //Trace otherPlayer's shortest path & reset flags
+            fewestSegmentsToVictory(otherPlayer);
+            currNodeOther = otherPlayerFinish;
+            while (currNodeOther.getPredecessor() != otherPlayerStart) {
+                currNodeOther = currNodeOther.getPredecessor();
+                currNodeOther.setUserFlag(0);
+            }
+
+            return p;
+        }
+
+        else if(fewestSegmentsToVictory(playerId) < fewestSegmentsToVictory(otherPlayer)) {
+            //Trace otherPlayer's shortest path & set flags
+            fewestSegmentsToVictory(otherPlayer);
+            Node currNodeOther = otherPlayerFinish;
+            while (currNodeOther.getPredecessor() != otherPlayerStart) {
+                currNodeOther = currNodeOther.getPredecessor();
+                currNodeOther.setUserFlag(otherPlayer);
+            }
+
+            //Trace userOfInt's shortest path & place segment
+            fewestSegmentsToVictory(this.playerId);
+            Node currNodeUserOfInt = userOfIntFinish;
+            PlayerMove p = null;
+            while (currNodeUserOfInt.getPredecessor() != userOfIntStart) {
+                currNodeUserOfInt = currNodeUserOfInt.getPredecessor();
+                if (currNodeUserOfInt.getUserFlag() == otherPlayer) {
+                    int xcoord = currNodeUserOfInt.getRow();
+                    int ycoord = currNodeUserOfInt.getColumn();
+                    p = new PlayerMove(new Coordinate(xcoord, ycoord), this.playerId);
+                }
+            }
+
+            //Trace otherPlayer's shortest path & reset flags
+            fewestSegmentsToVictory(otherPlayer);
+            currNodeOther = otherPlayerFinish;
+            while (currNodeOther.getPredecessor() != otherPlayerStart) {
+                currNodeOther = currNodeOther.getPredecessor();
+                currNodeOther.setUserFlag(0);
+            }
+
+            return p;
+        }
+
+        else{
+            //Trace otherPlayer's shortest path & set flags
+            fewestSegmentsToVictory(otherPlayer);
+            Node currNodeOther = otherPlayerFinish;
+            currNodeOther = currNodeOther.getPredecessor();
+
+
+            //Make a move for the last position in the shortest path of otherPlayer for our Player
+            int xcoord = currNodeOther.getRow();
+            int ycoord = currNodeOther.getColumn();
+            PlayerMove p = new PlayerMove(new Coordinate(xcoord, ycoord), playerId);
+
+            return p;
+        }
+        */
     }
 
 
