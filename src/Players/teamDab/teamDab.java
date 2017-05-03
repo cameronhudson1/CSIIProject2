@@ -12,19 +12,29 @@ import java.util.*;
 public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         PlayerModulePart3 {
 
-    /** The graph that stores the spots on the game board */
+    /**
+     * The graph that stores the spots on the game board
+     */
     private HashMap<Coordinate, Node> graph;
 
-    /** The dimensions of the game board */
+    /**
+     * The dimensions of the game board
+     */
     private int dim;
 
-    /** The maximum cells on the game board horizontally or vertically */
+    /**
+     * The maximum cells on the game board horizontally or vertically
+     */
     private int max;
 
-    /** This player's player id */
+    /**
+     * This player's player id
+     */
     private int playerId;
 
-    /** A holder list for the vertexes usable for Dijkstra's algorithm run */
+    /**
+     * A holder list for the vertexes usable for Dijkstra's algorithm run
+     */
     private List<Node> dijVertexHolder;
 
     /**
@@ -33,16 +43,17 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
      * PlayerModule is created. The initPlayer method is called at the
      * beginning of each game, and must be able to reset the player
      * for the next game.
-     * @param dim size of the smaller dimension of the playing area for one
-     *             player. The grid of nodes for that player is of size
-     *             dim x (dim+1).
+     *
+     * @param dim      size of the smaller dimension of the playing area for one
+     *                 player. The grid of nodes for that player is of size
+     *                 dim x (dim+1).
      * @param playerId id (1 or 2) for this player.
      */
     public void initPlayer(int dim, int playerId) {
         this.dim = dim;
         this.max = 2 * dim + 1;
         this.playerId = playerId;
-        this.graph = new HashMap<>((int)Math.pow(max, 2) + 4);
+        this.graph = new HashMap<>((int) Math.pow(max, 2) + 4);
         this.dijVertexHolder = new LinkedList<>();
         initGraph();
     }
@@ -53,6 +64,7 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
      * call this method after verifying the validity of the current move. Thus,
      * you do not need to verify the move provided to this method. It is
      * guaranteed to be a valid move.
+     *
      * @param m PlayerMove representing the most recent move
      */
     public void lastMove(PlayerMove m) {
@@ -64,11 +76,11 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
     /**
      * Indicates that the other player has been invalidated.
      * Required task for Part 2.
-     *
+     * <p>
      * Called by Referee when one player has been Invalidated.
      * This function will call all of the required moves for the other player
      * to win.
-     *
+     * <p>
      * Follows the predecessors on Dijkstra's algorithm back through the path
      * At each required move (predecessor), lastMove() is called to connect
      * that node to it's neighbors.
@@ -79,7 +91,7 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         Node start = graph.get(new Coordinate(-1, playerId == 1 ? 3 : 0));
         Node finish = graph.get(new Coordinate(-1, playerId == 1 ? 1 : 2));
 
-        while(finish.getPredecessor() != start){
+        while (finish.getPredecessor() != start) {
             Coordinate finishCoord = new Coordinate(finish.getPredecessor().
                     getRow(), finish.getPredecessor().getColumn());
             PlayerMove nextMove = new PlayerMove(finishCoord, playerId);
@@ -94,7 +106,7 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
      * that updating internal game state does NOT occur inside of this method.
      * See lastMove. An initial, working version of this method is required for
      * Part 2. It may be refined subsequently.
-     *
+     * <p>
      * Just plays the first legal move generated. Nothing fancy.
      *
      * @return a PlayerMove object representing the next move.
@@ -105,8 +117,6 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
                 return p;
             }
         }
-        return null;
-
         int otherPlayer = (this.playerId == 1 ? 2 : 1);
 
         Node otherPlayerFinish = graph.get(new Coordinate(-1, 2));
@@ -114,38 +124,40 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         Node userOfIntFinish = graph.get(new Coordinate(-1, 1));
         Node userOfIntStart = graph.get(new Coordinate(-1, 3));
 
-            //Trace otherPlayer's shortest path & set flags
-            fewestSegmentsToVictory(otherPlayer);
-            Node currNodeOther = otherPlayerFinish;
-            while (currNodeOther.getPredecessor() != otherPlayerStart) {
-                currNodeOther = currNodeOther.getPredecessor();
-                currNodeOther.setUserFlag(otherPlayer);
-            }
-
-            //Trace userOfInt's shortest path & place segment
-            fewestSegmentsToVictory(this.playerId);
-            Node currNodeUserOfInt = userOfIntFinish;
-            while(currNodeUserOfInt.getPredecessor() != userOfIntStart){
-                currNodeUserOfInt = currNodeUserOfInt.getPredecessor();
-                if(currNodeUserOfInt.getUserFlag() == otherPlayer){
-                    int xcoord = currNodeUserOfInt.getRow();
-                    int ycoord = currNodeUserOfInt.getColumn();
-                    PlayerMove p = new PlayerMove(new Coordinate(xcoord, ycoord), this.playerId);
-                    this.lastMove(p);
-                }
-            }
-
-            //Trace otherPlayer's shortest path & reset flags
-            fewestSegmentsToVictory(otherPlayer);
-            currNodeOther = otherPlayerFinish;
-            while (currNodeOther.getPredecessor() != otherPlayerStart) {
-                currNodeOther = currNodeOther.getPredecessor();
-                currNodeOther.setUserFlag(0);
-            }
-
-            lastMove(p);
+        //Trace otherPlayer's shortest path & set flags
+        fewestSegmentsToVictory(otherPlayer);
+        Node currNodeOther = otherPlayerFinish;
+        while (currNodeOther.getPredecessor() != otherPlayerStart) {
+            currNodeOther = currNodeOther.getPredecessor();
+            currNodeOther.setUserFlag(otherPlayer);
         }
+
+        //Trace userOfInt's shortest path & place segment
+        fewestSegmentsToVictory(this.playerId);
+        Node currNodeUserOfInt = userOfIntFinish;
+        PlayerMove p = null;
+        while (currNodeUserOfInt.getPredecessor() != userOfIntStart) {
+            currNodeUserOfInt = currNodeUserOfInt.getPredecessor();
+            if (currNodeUserOfInt.getUserFlag() == otherPlayer) {
+                int xcoord = currNodeUserOfInt.getRow();
+                int ycoord = currNodeUserOfInt.getColumn();
+                p = new PlayerMove(new Coordinate(xcoord, ycoord), this.playerId);
+                this.lastMove(p);
+            }
+        }
+
+        //Trace otherPlayer's shortest path & reset flags
+        fewestSegmentsToVictory(otherPlayer);
+        currNodeOther = otherPlayerFinish;
+        while (currNodeOther.getPredecessor() != otherPlayerStart) {
+            currNodeOther = currNodeOther.getPredecessor();
+            currNodeOther.setUserFlag(0);
+        }
+
+        return p;
     }
+
+
 
     /**
      * Part 1 task that tests if a player has won the game

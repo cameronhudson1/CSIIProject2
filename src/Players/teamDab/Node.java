@@ -35,6 +35,8 @@ public class Node {
     /** The shortest possible distance from the start node using Dijkstra's */
     private int distance;
 
+    private int userFlag;
+
     /**
      * Constructor for Node class. Sets playerOccupied to 0 initially, loads
      * its neighbors as null for the four corners.
@@ -50,6 +52,7 @@ public class Node {
         this.column = -2;
         this.predecessor = null;
         this.distance = Integer.MAX_VALUE;
+        this.userFlag = 0;
     }
 
     /**
@@ -74,6 +77,8 @@ public class Node {
             }
         }
     }
+
+
 
     /**
      * @return the playerId of the player occupying the node
@@ -239,5 +244,21 @@ public class Node {
     public String toString() {
         return "Player " + getPlayerOccupied() + " occupies a space at " +
                 "row: " + this.getRow() + " and at column: " + this.getColumn();
+    }
+
+    /**
+     * Getter for userFlag
+     * @return
+     */
+    public int getUserFlag() {
+        return userFlag;
+    }
+
+    /**
+     * Setter for userFlag
+     * @param userFlag
+     */
+    public void setUserFlag(int userFlag) {
+        this.userFlag = userFlag;
     }
 }
