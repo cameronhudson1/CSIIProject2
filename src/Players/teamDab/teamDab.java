@@ -10,7 +10,7 @@ import java.util.*;
  * @author Mark Nash
  */
 public class teamDab implements PlayerModulePart1, PlayerModulePart2,
-        PlayerModulePart3 {
+        PlayerModulePart3, PlayerModule{
 
     /**
      * The graph that stores the spots on the game board
@@ -112,17 +112,25 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
      * @return a PlayerMove object representing the next move.
      */
     public PlayerMove move() {
-        for (PlayerMove p : allLegalMoves()) {
-            if (graph.get(p.getCoordinate()).getPlayerOccupied() == 0) {
-                return p;
-            }
-        }
+
         int otherPlayer = (this.playerId == 1 ? 2 : 1);
 
-        Node otherPlayerFinish = graph.get(new Coordinate(-1, 2));
-        Node otherPlayerStart = graph.get(new Coordinate(-1, 0));
-        Node userOfIntFinish = graph.get(new Coordinate(-1, 1));
-        Node userOfIntStart = graph.get(new Coordinate(-1, 3));
+        Node otherPlayerFinish;
+        Node otherPlayerStart;
+        Node userOfIntFinish;
+        Node userOfIntStart;
+        if(this.playerId == 1) {
+            otherPlayerFinish = graph.get(new Coordinate(-1, 2));
+            otherPlayerStart = graph.get(new Coordinate(-1, 0));
+            userOfIntFinish = graph.get(new Coordinate(-1, 1));
+            userOfIntStart = graph.get(new Coordinate(-1, 3));
+        }
+        else{
+            userOfIntFinish = graph.get(new Coordinate(-1, 2));
+            userOfIntStart = graph.get(new Coordinate(-1, 0));
+            otherPlayerFinish = graph.get(new Coordinate(-1, 1));
+            otherPlayerStart = graph.get(new Coordinate(-1, 3));
+        }
 
         //Trace otherPlayer's shortest path & set flags
         fewestSegmentsToVictory(otherPlayer);
@@ -142,7 +150,6 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
                 int xcoord = currNodeUserOfInt.getRow();
                 int ycoord = currNodeUserOfInt.getColumn();
                 p = new PlayerMove(new Coordinate(xcoord, ycoord), this.playerId);
-                this.lastMove(p);
             }
         }
 
