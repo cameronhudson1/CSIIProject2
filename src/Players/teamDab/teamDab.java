@@ -137,6 +137,45 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
             }
         }
         return null;
+
+        int otherPlayer = (this.playerId == 1 ? 2 : 1);
+
+        Node otherPlayerFinish = graph.get(new Coordinate(-1, 2));
+        Node otherPlayerStart = graph.get(new Coordinate(-1, 0));
+        Node userOfIntFinish = graph.get(new Coordinate(-1, 1));
+        Node userOfIntStart = graph.get(new Coordinate(-1, 3));
+
+            //Trace otherPlayer's shortest path & set flags
+            fewestSegmentsToVictory(otherPlayer);
+            Node currNodeOther = otherPlayerFinish;
+            while (currNodeOther.getPredecessor() != otherPlayerStart) {
+                currNodeOther = currNodeOther.getPredecessor();
+                currNodeOther.setUserFlag(otherPlayer);
+            }
+
+            //Trace userOfInt's shortest path & place segment
+            fewestSegmentsToVictory(this.playerId);
+            Node currNodeUserOfInt = userOfIntFinish;
+            while(currNodeUserOfInt.getPredecessor() != userOfIntStart){
+                currNodeUserOfInt = currNodeUserOfInt.getPredecessor();
+                if(currNodeUserOfInt.getUserFlag() == otherPlayer){
+                    int xcoord = currNodeUserOfInt.getRow();
+                    int ycoord = currNodeUserOfInt.getColumn();
+                    PlayerMove p = new PlayerMove(new Coordinate(xcoord, ycoord), this.playerId);
+                    this.lastMove(p);
+                }
+            }
+
+            //Trace otherPlayer's shortest path & reset flags
+            fewestSegmentsToVictory(otherPlayer);
+            currNodeOther = otherPlayerFinish;
+            while (currNodeOther.getPredecessor() != otherPlayerStart) {
+                currNodeOther = currNodeOther.getPredecessor();
+                currNodeOther.setUserFlag(0);
+            }
+
+            lastMove(p);
+        }
     }
 
     /**
