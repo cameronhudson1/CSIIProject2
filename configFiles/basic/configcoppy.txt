@@ -11,7 +11,7 @@
 # size (2*DIM+1) by (2*DIM+1).
 # DIM has a default value of 6 if it is not specified in
 # the configuration file.
-DIM 7
+DIM 4
 
 # GAMES is used to indicate the number of games to
 # play between the two Players.  It is considered
@@ -39,7 +39,7 @@ GAMES 1
 # Valid choices for AI Players include:
 # CARELESS, RANDOM, DEFENSIVE, OKPLAYER, GOODPLAYER, TOUGHPLAYER
 # as well as any module you create to play the game.
-PLAYERS HUMAN,RANDOM
+PLAYERS HUMAN,DEFENSIVE
 
 # TIMELIMIT is used to restrict player module computation.
 # It must be an integer in the range 1-100.
@@ -49,7 +49,7 @@ PLAYERS HUMAN,RANDOM
 # player module takes longer than this to return from
 # any of its function calls (primarily this is for the move function)
 # the player is invalidated.
-TIMELIMIT 8
+TIMELIMIT 20
 
 # DISPLAYDELAY is used to artificially slow down a game
 # involving player modules that compute quickly, so that
@@ -81,7 +81,7 @@ DISPLAYDELAY 500
 # of moves per player).  By default, NUMRANDOMMOVES
 # has a value of 0.  Random moves are generated
 # after PREMOVES (it is legal to incorporate both).
-NUMRANDOMMOVES 0
+NUMRANDOMMOVES 5
 
 # LOGFILE is used to store the moves of the game
 # as a sequence of PREMOVEs so that they can be cut

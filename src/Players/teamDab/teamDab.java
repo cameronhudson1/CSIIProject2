@@ -113,21 +113,22 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
      */
     public PlayerMove move() {
 
-        int otherPlayer = (this.playerId == 1 ? 2 : 1);
-
+        int otherPlayer;
         Node otherPlayerFinish;
         Node otherPlayerStart;
         Node userOfIntFinish;
         Node userOfIntStart;
 
-        if(this.playerId == 1) {
+        if (this.playerId == 1) {
+            otherPlayer = 2;
             otherPlayerFinish = graph.get(new Coordinate(-1, 2));
             otherPlayerStart = graph.get(new Coordinate(-1, 0));
             userOfIntFinish = graph.get(new Coordinate(-1, 1));
             userOfIntStart = graph.get(new Coordinate(-1, 3));
         }
 
-        else{
+        else {
+            otherPlayer = 1;
             userOfIntFinish = graph.get(new Coordinate(-1, 2));
             userOfIntStart = graph.get(new Coordinate(-1, 0));
             otherPlayerFinish = graph.get(new Coordinate(-1, 1));
@@ -135,7 +136,6 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         }
 
         //Trace otherPlayer's shortest path & set flags
-        fewestSegmentsToVictory(otherPlayer);
         Node currNodeOther = otherPlayerFinish;
         while (currNodeOther.getPredecessor() != otherPlayerStart) {
             currNodeOther = currNodeOther.getPredecessor();
@@ -143,7 +143,6 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         }
 
         //Trace userOfInt's shortest path & place segment
-        fewestSegmentsToVictory(this.playerId);
         Node currNodeUserOfInt = userOfIntFinish;
         ArrayList<PlayerMove> moves = new ArrayList<>();
         while (currNodeUserOfInt.getPredecessor() != userOfIntStart) {
@@ -155,6 +154,9 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
                 moves.add(p);
             }
         }
+
+
+
 
         //Trace otherPlayer's shortest path & reset flags
         fewestSegmentsToVictory(otherPlayer);
@@ -174,92 +176,6 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         }
 
         return moves.get(0);
-
-        //Prioritize building in the direction of movement
-
-
-        /*
-        if(playerId == 1){
-            //Trace otherPlayer's shortest path & set flags
-            fewestSegmentsToVictory(otherPlayer);
-            Node currNodeOther = otherPlayerFinish;
-            while (currNodeOther.getPredecessor() != otherPlayerStart) {
-                currNodeOther = currNodeOther.getPredecessor();
-                currNodeOther.setUserFlag(otherPlayer);
-            }
-
-            //Trace userOfInt's shortest path & place segment
-            fewestSegmentsToVictory(this.playerId);
-            Node currNodeUserOfInt = userOfIntFinish;
-            PlayerMove p = null;
-            while (currNodeUserOfInt.getPredecessor() != userOfIntStart) {
-                currNodeUserOfInt = currNodeUserOfInt.getPredecessor();
-                if (currNodeUserOfInt.getUserFlag() == otherPlayer) {
-                    int xcoord = currNodeUserOfInt.getRow();
-                    int ycoord = currNodeUserOfInt.getColumn();
-                    p = new PlayerMove(new Coordinate(xcoord, ycoord), this.playerId);
-                }
-            }
-
-            //Trace otherPlayer's shortest path & reset flags
-            fewestSegmentsToVictory(otherPlayer);
-            currNodeOther = otherPlayerFinish;
-            while (currNodeOther.getPredecessor() != otherPlayerStart) {
-                currNodeOther = currNodeOther.getPredecessor();
-                currNodeOther.setUserFlag(0);
-            }
-
-            return p;
-        }
-
-        else if(fewestSegmentsToVictory(playerId) < fewestSegmentsToVictory(otherPlayer)) {
-            //Trace otherPlayer's shortest path & set flags
-            fewestSegmentsToVictory(otherPlayer);
-            Node currNodeOther = otherPlayerFinish;
-            while (currNodeOther.getPredecessor() != otherPlayerStart) {
-                currNodeOther = currNodeOther.getPredecessor();
-                currNodeOther.setUserFlag(otherPlayer);
-            }
-
-            //Trace userOfInt's shortest path & place segment
-            fewestSegmentsToVictory(this.playerId);
-            Node currNodeUserOfInt = userOfIntFinish;
-            PlayerMove p = null;
-            while (currNodeUserOfInt.getPredecessor() != userOfIntStart) {
-                currNodeUserOfInt = currNodeUserOfInt.getPredecessor();
-                if (currNodeUserOfInt.getUserFlag() == otherPlayer) {
-                    int xcoord = currNodeUserOfInt.getRow();
-                    int ycoord = currNodeUserOfInt.getColumn();
-                    p = new PlayerMove(new Coordinate(xcoord, ycoord), this.playerId);
-                }
-            }
-
-            //Trace otherPlayer's shortest path & reset flags
-            fewestSegmentsToVictory(otherPlayer);
-            currNodeOther = otherPlayerFinish;
-            while (currNodeOther.getPredecessor() != otherPlayerStart) {
-                currNodeOther = currNodeOther.getPredecessor();
-                currNodeOther.setUserFlag(0);
-            }
-
-            return p;
-        }
-
-        else{
-            //Trace otherPlayer's shortest path & set flags
-            fewestSegmentsToVictory(otherPlayer);
-            Node currNodeOther = otherPlayerFinish;
-            currNodeOther = currNodeOther.getPredecessor();
-
-
-            //Make a move for the last position in the shortest path of otherPlayer for our Player
-            int xcoord = currNodeOther.getRow();
-            int ycoord = currNodeOther.getColumn();
-            PlayerMove p = new PlayerMove(new Coordinate(xcoord, ycoord), playerId);
-
-            return p;
-        }
-        */
     }
 
 
@@ -607,7 +523,6 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
     public boolean isWinnable(int userOfInt, int currTurn, int movesLeft) {
         teamDab copy = createCopy();
         boolean hasWon = copy.isWinnableHelper(userOfInt, currTurn, movesLeft);
-        System.out.println("THE ANSWER IS " + hasWon);
         return hasWon;
     }
 
@@ -620,45 +535,55 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
      * @param movesLeft same as in isWinnable
      * @return same as in isWinnable
      */
-    private Boolean isWinnableHelper(int userOfInt, int currTurn, int
-            movesLeft){
-        int otherPlayer = (userOfInt == 1 ? 2 : 1);
-        if (movesLeft == 0 && hasWonGame(userOfInt)) {
-            return true;
-        }
-        if (movesLeft == 0 && hasWonGame(otherPlayer)) {
-            return false;
+    private Boolean isWinnableHelper(int userOfInt, int currTurn,
+                                     int movesLeft){
+        if (movesLeft == 0) {
+            return hasWonGame(userOfInt);
         }
         else {
+            int otherPlayer = (userOfInt == 1 ? 2 : 1);
+
             //It's User Of Int's Turn
             if (userOfInt == currTurn) {
-                for (PlayerMove m : allLegalMoves()) {
-                    lastMove(m);
-                    if (isWinnableHelper(userOfInt, otherPlayer, movesLeft -
-                            1) == true) {
-                        undoMove(m);
+                ArrayList<teamDab> successors = getSuccessors(this, userOfInt);
+                for (teamDab b : successors) {
+                    if(b.isWinnable(userOfInt, otherPlayer, movesLeft - 1) == true){
                         return true;
                     }
-                    undoMove(m);
+                    //isPath = isPath || b.isWinnable(userOfInt, otherPlayer, movesLeft - 1);
                 }
                 return false;
             }
 
             //It Ain't
             else {
+                ArrayList<teamDab> successors = getSuccessors(this, otherPlayer);
                 Boolean flag = true;
-                for (PlayerMove m : allLegalMoves()) {
-                    if (isWinnableHelper(userOfInt, userOfInt, movesLeft - 1)
-                            == false) {
-                        undoMove(m);
+                for (teamDab b : successors) {
+                    if(b.isWinnable(userOfInt, userOfInt, movesLeft - 1) == false){
                         flag = false;
                         return false;
                     }
-                    undoMove(m);
+                    //isPath = isPath || b.isWinnable(userOfInt, userOfInt, movesLeft - 1);
                 }
                 return flag;
             }
         }
+    }
+
+    public ArrayList<teamDab> getSuccessors(teamDab b, int user){
+        b.setPlayerId(user);
+        ArrayList<teamDab> successors = new ArrayList<>();
+        for(PlayerMove p : b.allLegalMoves()){
+            teamDab temp = b.createCopy();
+            temp.lastMove(p);
+            successors.add(temp);
+        }
+        return successors;
+    }
+
+    public void setPlayerId(int p){
+        this.playerId = p;
     }
 
     /**
