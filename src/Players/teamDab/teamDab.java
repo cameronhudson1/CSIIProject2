@@ -12,29 +12,19 @@ import java.util.*;
 public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         PlayerModulePart3, PlayerModule{
 
-    /**
-     * The graph that stores the spots on the game board
-     */
+    /** The graph that stores the spots on the game board */
     private HashMap<Coordinate, Node> graph;
 
-    /**
-     * The dimensions of the game board
-     */
+    /** The dimensions of the game board */
     private int dim;
 
-    /**
-     * The maximum cells on the game board horizontally or vertically
-     */
+    /** The maximum cells on the game board horizontally or vertically */
     private int max;
 
-    /**
-     * This player's player id
-     */
+    /** This player's player id */
     private int playerId;
 
-    /**
-     * A holder list for the vertexes usable for Dijkstra's algorithm run
-     */
+    /** A holder list for the vertexes usable for Dijkstra's algorithm run */
     private List<Node> dijVertexHolder;
 
     /**
@@ -113,14 +103,14 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
      */
     public PlayerMove move() {
 
-        int otherPlayer;
+        int otherPlayer = (this.playerId == 1 ? 2 : 1);
+
         Node otherPlayerFinish;
         Node otherPlayerStart;
         Node userOfIntFinish;
         Node userOfIntStart;
 
         if (this.playerId == 1) {
-            otherPlayer = 2;
             otherPlayerFinish = graph.get(new Coordinate(-1, 2));
             otherPlayerStart = graph.get(new Coordinate(-1, 0));
             userOfIntFinish = graph.get(new Coordinate(-1, 1));
@@ -128,7 +118,6 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         }
 
         else {
-            otherPlayer = 1;
             userOfIntFinish = graph.get(new Coordinate(-1, 2));
             userOfIntStart = graph.get(new Coordinate(-1, 0));
             otherPlayerFinish = graph.get(new Coordinate(-1, 1));
@@ -136,6 +125,7 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         }
 
         //Trace otherPlayer's shortest path & set flags
+        fewestSegmentsToVictory(otherPlayer);
         Node currNodeOther = otherPlayerFinish;
         while (currNodeOther.getPredecessor() != otherPlayerStart) {
             currNodeOther = currNodeOther.getPredecessor();
@@ -143,6 +133,7 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         }
 
         //Trace userOfInt's shortest path & place segment
+        fewestSegmentsToVictory(this.playerId);
         Node currNodeUserOfInt = userOfIntFinish;
         ArrayList<PlayerMove> moves = new ArrayList<>();
         while (currNodeUserOfInt.getPredecessor() != userOfIntStart) {
@@ -155,9 +146,6 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
             }
         }
 
-
-
-
         //Trace otherPlayer's shortest path & reset flags
         fewestSegmentsToVictory(otherPlayer);
         currNodeOther = otherPlayerFinish;
@@ -166,10 +154,10 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
             currNodeOther.setUserFlag(0);
         }
 
-        if(moves.size() > 1){
-            for(PlayerMove move : moves){
+        if (moves.size() > 1) {
+            for (PlayerMove move : moves){
                 int ycoord = move.getCoordinate().getCol();
-                if(ycoord % 2 == 1){
+                if (ycoord % 2 == 1){
                     return move;
                 }
             }
@@ -520,23 +508,21 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
      * player to guarantee a win after the specified number of total moves.
      */
     @Override
-    public boolean isWinnable(int userOfInt, int currTurn, int movesLeft) {
-        teamDab copy = createCopy();
-        boolean hasWon = copy.isWinnableHelper(userOfInt, currTurn, movesLeft);
-        return hasWon;
+    public boolean isWinnable(int userOfInt, int currTurn, int movesLeft){
+        teamDab temp = this.createCopy();
+        return temp.isWinnableHelper(userOfInt, currTurn, movesLeft);
     }
 
     /**
-     * A helper method for isWinnable that uses a copy of the board as
-     * opposed to the board itself
+     * The acutal functionality of the isWinnable method.
      *
-     * @param userOfInt same as in isWinnable
-     * @param currTurn same as in isWinnable
-     * @param movesLeft same as in isWinnable
-     * @return same as in isWinnable
+     * @param userOfInt same as isWinnable
+     * @param currTurn same as isWinnable
+     * @param movesLeft same as isWinnable
+     * @return same as isWinnable
      */
-    private Boolean isWinnableHelper(int userOfInt, int currTurn,
-                                     int movesLeft){
+    private Boolean isWinnableHelper(int userOfInt, int currTurn, int
+            movesLeft) {
         if (movesLeft == 0) {
             return hasWonGame(userOfInt);
         }
@@ -550,7 +536,6 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
                     if(b.isWinnable(userOfInt, otherPlayer, movesLeft - 1) == true){
                         return true;
                     }
-                    //isPath = isPath || b.isWinnable(userOfInt, otherPlayer, movesLeft - 1);
                 }
                 return false;
             }
@@ -564,14 +549,21 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
                         flag = false;
                         return false;
                     }
-                    //isPath = isPath || b.isWinnable(userOfInt, userOfInt, movesLeft - 1);
                 }
                 return flag;
             }
         }
     }
 
-    public ArrayList<teamDab> getSuccessors(teamDab b, int user){
+    /**
+     * Makes deep coppies of all next possible moves that a player cna make
+     * and returns them.
+     *
+     * @param b the current teamDab instance
+     * @param user the user that the instance should have
+     * @return the list of possible teamDab instances that could be successors
+     */
+    private ArrayList<teamDab> getSuccessors(teamDab b, int user){
         b.setPlayerId(user);
         ArrayList<teamDab> successors = new ArrayList<>();
         for(PlayerMove p : b.allLegalMoves()){
@@ -580,10 +572,6 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
             successors.add(temp);
         }
         return successors;
-    }
-
-    public void setPlayerId(int p){
-        this.playerId = p;
     }
 
     /**
@@ -598,11 +586,7 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         setNeighbors(m.getCoordinate(), n);
     }
 
-    /**
-     * Creates a deep copy.
-     *
-     * @return the deep copy reference
-     */
+    /** @return a deep copy reference */
     private teamDab createCopy() {
         teamDab copy = new teamDab();
         copy.initPlayer(dim, playerId);
@@ -614,6 +598,13 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         return copy;
     }
 
+    /**
+     * Setter for playerID
+     * @param playerId the ID to set
+     */
+    private void setPlayerId(int playerId) {
+        this.playerId = playerId;
+    }
 
     /**
      * prints out the state of a game board for debugging and also fun
@@ -658,23 +649,5 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
             }
         }
         return true;
-    }
-
-    public static void main(String[] args) {
-
-        teamDab t = new teamDab();
-        t.initPlayer(3, 1);
-        teamDab a = t.createCopy();
-        t.lastMove(new PlayerMove(new Coordinate(1,1),2));
-        t.lastMove(new PlayerMove(new Coordinate(2,4),1));
-        t.lastMove(new PlayerMove(new Coordinate(5,3),2));
-        t.lastMove(new PlayerMove(new Coordinate(3,1),1));
-        teamDab c = t.createCopy();
-        System.out.println(t.equals(c));
-        t.undoMove(new PlayerMove(new Coordinate(1,1),2));
-        t.undoMove(new PlayerMove(new Coordinate(2,4),1));
-        t.undoMove(new PlayerMove(new Coordinate(5,3),2));
-        t.undoMove(new PlayerMove(new Coordinate(3,1),1));
-        System.out.println(a.equals(t));
     }
 }
