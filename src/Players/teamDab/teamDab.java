@@ -508,32 +508,24 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
      * player to guarantee a win after the specified number of total moves.
      */
     @Override
-    public boolean isWinnable(int userOfInt, int currTurn, int movesLeft){
-        teamDab temp = this.createCopy();
-        return temp.isWinnableHelper(userOfInt, currTurn, movesLeft);
-    }
-
-    /**
-     * The acutal functionality of the isWinnable method.
-     *
-     * @param userOfInt same as isWinnable
-     * @param currTurn same as isWinnable
-     * @param movesLeft same as isWinnable
-     * @return same as isWinnable
-     */
-    private Boolean isWinnableHelper(int userOfInt, int currTurn, int
-            movesLeft) {
+    public boolean isWinnable(int userOfInt, int currTurn, int movesLeft) {
+        int otherPlayer = (userOfInt == 1 ? 2 : 1);
         if (movesLeft == 0) {
             return hasWonGame(userOfInt);
         }
+        else if (currTurn == otherPlayer && hasWonGame(userOfInt)) {
+            return true;
+        }
+        else if (currTurn == userOfInt && hasWonGame(otherPlayer)) {
+            return false;
+        }
         else {
-            int otherPlayer = (userOfInt == 1 ? 2 : 1);
 
             //It's User Of Int's Turn
             if (userOfInt == currTurn) {
                 for (PlayerMove p : allLegalMoves()) {
                     lastMove(p);
-                    if(isWinnableHelper(userOfInt, otherPlayer, movesLeft-1)) {
+                    if(isWinnable(userOfInt, otherPlayer, movesLeft-1)) {
                         undoMove(p);
                         return true;
                     }
@@ -546,7 +538,7 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
             else {
                 for (PlayerMove p : allLegalMoves()) {
                     lastMove(p);
-                    if(!isWinnableHelper(userOfInt, otherPlayer, movesLeft-1)) {
+                    if(!isWinnable(userOfInt, otherPlayer, movesLeft-1)) {
                         undoMove(p);
                         return false;
                     }
@@ -555,25 +547,6 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
                 return true;
             }
         }
-    }
-
-    /**
-     * Makes deep coppies of all next possible moves that a player cna make
-     * and returns them.
-     *
-     * @param b the current teamDab instance
-     * @param user the user that the instance should have
-     * @return the list of possible teamDab instances that could be successors
-     */
-    private ArrayList<teamDab> getSuccessors(teamDab b, int user){
-        b.setPlayerId(user);
-        ArrayList<teamDab> successors = new ArrayList<>();
-        for(PlayerMove p : b.allLegalMoves()){
-            teamDab temp = b.createCopy();
-            temp.lastMove(p);
-            successors.add(temp);
-        }
-        return successors;
     }
 
     /**
@@ -586,26 +559,6 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
         Node n = graph.get(m.getCoordinate());
         n.setPlayerOccupied(0);
         setNeighbors(m.getCoordinate(), n);
-    }
-
-    /** @return a deep copy reference */
-    private teamDab createCopy() {
-        teamDab copy = new teamDab();
-        copy.initPlayer(dim, playerId);
-        for (Coordinate c : graph.keySet()) {
-            Node alpha = graph.get(c);
-            Node omega = copy.graph.get(c);
-            omega.copy(alpha, copy.graph);
-        }
-        return copy;
-    }
-
-    /**
-     * Setter for playerID
-     * @param playerId the ID to set
-     */
-    private void setPlayerId(int playerId) {
-        this.playerId = playerId;
     }
 
     /**
