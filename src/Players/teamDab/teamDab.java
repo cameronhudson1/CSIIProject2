@@ -531,26 +531,28 @@ public class teamDab implements PlayerModulePart1, PlayerModulePart2,
 
             //It's User Of Int's Turn
             if (userOfInt == currTurn) {
-                ArrayList<teamDab> successors = getSuccessors(this, userOfInt);
-                for (teamDab b : successors) {
-                    if(b.isWinnable(userOfInt, otherPlayer, movesLeft - 1) == true){
+                for (PlayerMove p : allLegalMoves()) {
+                    lastMove(p);
+                    if(isWinnableHelper(userOfInt, otherPlayer, movesLeft-1)) {
+                        undoMove(p);
                         return true;
                     }
+                    undoMove(p);
                 }
                 return false;
             }
 
             //It Ain't
             else {
-                ArrayList<teamDab> successors = getSuccessors(this, otherPlayer);
-                Boolean flag = true;
-                for (teamDab b : successors) {
-                    if(b.isWinnable(userOfInt, userOfInt, movesLeft - 1) == false){
-                        flag = false;
+                for (PlayerMove p : allLegalMoves()) {
+                    lastMove(p);
+                    if(!isWinnableHelper(userOfInt, otherPlayer, movesLeft-1)) {
+                        undoMove(p);
                         return false;
                     }
+                    undoMove(p);
                 }
-                return flag;
+                return true;
             }
         }
     }

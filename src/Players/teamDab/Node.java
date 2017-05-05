@@ -215,17 +215,17 @@ public class Node {
         if (obj instanceof  Node) {
             Node n = (Node) obj;
             if (playerOccupied != n.playerOccupied ||
-                row != n.row ||
-                column != n.column ||
-                neighbors.size() != n.neighbors.size()) {
+                    row != n.row ||
+                    column != n.column ||
+                    neighbors.size() != n.neighbors.size()) {
                 return false;
             }
             for (int i = 0; i < neighbors.size(); i++) {
                 if (neighbors.get(i) == null) {
-                   if (n.neighbors.get(i) == null) {
-                       continue;
-                   }
-                   return false;
+                    if (n.neighbors.get(i) == null) {
+                        continue;
+                    }
+                    return false;
                 }
                 else if (neighbors.get(i).playerOccupied != n.neighbors.get
                         (i).playerOccupied) {
